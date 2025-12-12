@@ -1,0 +1,51 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+
+#container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+#graph-container {
+  flex: 1;
+  background: #fafafa;
+  position: relative;
+}
+
+#sidebar {
+  width: 320px;
+  background: #fff;
+  border-left: 1px solid #ddd;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+#search {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+#node-details {
+  margin-top: 16px;
+}
+
+#node-title {
+  font-size: 20px;
+  margin: 0 0 8px 0;
+}
+
+#node-meta {
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}

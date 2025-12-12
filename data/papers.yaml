@@ -1,0 +1,92 @@
+nodes:
+  - key: taktok
+    label: "TacTok: semantics-aware proof synthesis"
+    year: 2020
+    authors:
+      - Emily First
+      - Yuriy Brun
+      - Arjun Guha
+    conf: OOPSLA
+    url: https://dl.acm.org/doi/10.1145/3428299
+    cluster: LLMAutomation
+  - key: coqgym
+    label: "Learning to Prove Theorems via Interacting with Proof Assistants"
+    year: 2019
+    authors:
+      - Kaiyu Yang
+      - Jia Deng
+    conf: ICML
+    url: https://farxiv.org/abs/1905.09381
+    cluster: DataDrivenML
+  - key: llmsurvey
+    label: "Proof Automation with Large Language Models"
+    year: 2024
+    authors:
+      - Minghai Lu
+      - Benjamin Delaware
+      - Tianyi Zhang
+    conf: ASE
+    url: https://dl.acm.org/doi/10.1145/3691620.3695521
+    cluster: LLMAutomation
+  - key: datalog_provenance
+    label: "Provenance-guided synthesis of Datalog programs"
+    year: 2019
+    authors:
+      - Mukund Raghothaman
+      - Jonathan Mendelson
+      - David Zhao
+      - Mayur Naik
+      - Bernhard Scholz
+    conf: POPL
+    url: https://dl.acm.org/doi/abs/10.1145/3371130
+    cluster: Algorithmic
+  - key: sisyphus
+    label: "Mostly Automated Proof Repair for Verified Libraries"
+    year: 2023
+    authors:
+      - Kiran Gopinathan
+      - Mayank Keoliya
+      - Ilya Sergey
+    conf: PLDI
+    url: https://dl.acm.org/doi/10.1145/3591221
+    cluster: LLMAutomation
+  - key: leandojo
+    label: "LeanDojo: Theorem Proving with Retrieval-Augmented Language Models"
+    year: 2023
+    authors:
+      - Kaiyu Yang
+      - Aidan Swope
+      - Alex Gu
+      - Rahul Chalamala
+      - Peiyang Song
+      - Shixing Yu
+      - Saad Godil
+      - Ryan Prenger
+      - Anima Anandkumar
+    conf: NeurIPS
+    url: https://leandojo.org/leandojo.html
+    cluster: LLMAutomation
+  - key: malarea
+    label: "MaLARea: a Metasystem for Automated Reasoning in Large Theories"
+    year: 2007
+    authors:
+      - Josef Urban
+    conf: ESARLT
+    url: https://www.researchgate.net/publication/220806094_MaLARea_a_Metasystem_for_Automated_Reasoning_in_Large_Theories
+    cluster: DataDrivenML
+  - key: rippling
+    label: "Rippling: a heuristic for guiding inductive proofs"
+    year: 1993
+    authors:
+      - Alan Bundy
+      - Andrew Stevens
+      - Frank van Harmelen
+      - Andrew Ireland
+      - Alan Smaill
+    conf: AIJ
+    url: https://www.cs.vu.nl/~frankh/postscript/AIJ92.pdf
+    cluster: Algorithmic
+
+edges:
+  - from: taktok
+    to: coqgym
