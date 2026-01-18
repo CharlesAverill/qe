@@ -11,7 +11,12 @@ nodes:
     cluster: LLMAutomation
     notes: |
       Proof synthesis technique that looks at proof state and semantics to predict next tactic.
-      Outperforms other similar techniques on large Coq projects of 10k+ theorems
+      Outperforms ASTactic on large Coq projects of 10k+ theorems.
+      Does not outperform CoqHammer.
+      Success rate of 12.9%.
+      Can be used as a complement to ASTactic, CoqHammer, and similar approaches.
+      Successful at reasoning about higher-order logic where other tools fail.
+      Not all proofs require expert knowledge of all *tokens* in the proof script, only the tactics.
   - key: coqgym
     label: "Learning to Prove Theorems via Interacting with Proof Assistants"
     year: 2019
