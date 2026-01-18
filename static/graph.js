@@ -6,14 +6,10 @@ import jsyaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs'
 /* -----------------------------
    Color helpers
 --------------------------------*/
-// Color assignment using cached golden-angle hues seeded by a hash.
-// Produces deterministic, well-spread hex colors for arbitrary labels.
-
 const _clusterColorCache = new Map();
 
 // Convert HSL to hex
 function hslToHex(h, s, l) {
-    // h in [0,360), s,l in [0,1]
     s = Math.max(0, Math.min(1, s));
     l = Math.max(0, Math.min(1, l));
     const c = (1 - Math.abs(2 * l - 1)) * s;
@@ -35,7 +31,7 @@ function hslToHex(h, s, l) {
 
 // Simple deterministic integer hash (32-bit)
 function hash32(str) {
-    let h = 2166136261 >>> 0; // FNV-1a 32-bit offset basis
+    let h = 2166136261 >>> 0;
     for (let i = 0; i < str.length; i++) {
         h ^= str.charCodeAt(i);
         h = Math.imul(h, 16777619) >>> 0;
@@ -43,42 +39,16 @@ function hash32(str) {
     return h;
 }
 
-function multilineToUL(text) {
-  const ul = document.createElement("ul");
-
-  text
-    .split(/\r?\n/)
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
-    .forEach(line => {
-      const li = document.createElement("li");
-      li.textContent = line;
-      ul.appendChild(li);
-    });
-
-  return ul;
-}
-
 // Golden-angle color generator seeded by hash
-function generateColorForLabel(label, toRead=false) {
-    if (toRead)
-        return "#FF0000";
+function generateColorForLabel(label, toRead = false) {
+    if (toRead) return "#EF4444";
 
-    // golden angle in degrees
     const GOLDEN_ANGLE = 137.50776405003785;
-
-    // seed from hash (0..2^32-1)
-    const seed = hash32(String(label));
-
-    // use low bits to pick an initial offset, then spread by golden angle
-    const offset = (seed % 360); // 0..359
-    // perturb saturation / lightness slightly from hash to avoid identical tones
-    const sat = 0.55 + ((seed >>> 8) % 20) / 100; // 0.55..0.74
-    const light = 0.48 + ((seed >>> 16) % 14) / 100; // 0.48..0.62
-
-    // For better spread among many clusters, apply golden-angle offset multiplied
-    // by a hashed index to avoid clustering near nearby hash seeds.
-    const index = ((seed >>> 24) & 0xff); // 0..255
+    const seed = hash32(String(label)) + hash32(String(label).split('').reverse().join(''));
+    const offset = (seed % 360);
+    const sat = 0.55 + ((seed >>> 8) % 20) / 100;
+    const light = 0.48 + ((seed >>> 16) % 14) / 100;
+    const index = ((seed >>> 24) & 0xff);
     const hue = (offset + index * GOLDEN_ANGLE) % 360;
 
     return hslToHex(hue, sat, light);
@@ -86,7 +56,7 @@ function generateColorForLabel(label, toRead=false) {
 
 // Public function: deterministic, cached
 function clusterColor(clusterLabel) {
-    if (clusterLabel == null) return "#777777"; // fallback
+    if (clusterLabel == null) return "#777777";
     const key = String(clusterLabel);
     if (_clusterColorCache.has(key)) return _clusterColorCache.get(key);
     const color = generateColorForLabel(key, clusterLabel == "ToRead");
@@ -94,6 +64,79 @@ function clusterColor(clusterLabel) {
     return color;
 }
 
+/* -----------------------------
+   UI Helper Functions
+--------------------------------*/
+function showPaperDetails(attributes) {
+    const emptyState = document.getElementById('empty-state');
+    const paperContent = document.getElementById('paper-content');
+    
+    emptyState.style.display = 'none';
+    paperContent.style.display = 'block';
+    
+    // Update title and link
+    const titleEl = document.getElementById('node-title');
+    titleEl.href = attributes.url;
+    titleEl.textContent = attributes.label;
+    
+    // Update metadata
+    document.getElementById('node-authors').textContent = attributes.authors || 'N/A';
+    document.getElementById('node-venue').textContent = attributes.conf || 'N/A';
+    document.getElementById('node-year').textContent = attributes.year || 'N/A';
+    
+    // Update cluster
+    const clusterDot = document.getElementById('cluster-dot');
+    const clusterName = document.getElementById('node-cluster');
+    const clusterColorVal = clusterColor(attributes.cluster);
+    clusterDot.style.backgroundColor = clusterColorVal;
+    clusterName.textContent = attributes.cluster || 'Uncategorized';
+    clusterName.style.color = clusterColorVal;
+    
+    // Update notes
+    const notesList = document.getElementById('node-notes');
+    notesList.innerHTML = '';
+    if (attributes.notes) {
+        attributes.notes
+            .split(/\r?\n/)
+            .map(line => line.trim())
+            .filter(line => line.length > 0)
+            .forEach(line => {
+                const li = document.createElement('li');
+                li.textContent = line;
+                notesList.appendChild(li);
+            });
+    }
+    
+    // Update read paper button
+    const readBtn = document.getElementById('read-paper-btn');
+    readBtn.href = attributes.url;
+}
+
+function populateLegend(graph) {
+    const legendItems = document.getElementById('legend-items');
+    legendItems.innerHTML = '';
+    
+    const clusters = new Set();
+    graph.forEachNode((node, attr) => {
+        if (attr.cluster) clusters.add(attr.cluster);
+    });
+    
+    clusters.forEach(cluster => {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        
+        const dot = document.createElement('div');
+        dot.className = 'legend-dot';
+        dot.style.backgroundColor = clusterColor(cluster);
+        
+        const label = document.createElement('span');
+        label.textContent = cluster;
+        
+        item.appendChild(dot);
+        item.appendChild(label);
+        legendItems.appendChild(item);
+    });
+}
 
 /* -----------------------------
    Main
@@ -104,8 +147,8 @@ fetch("data/papers.yaml")
         const data = jsyaml.load(yaml);
         const graph = new graphology.Graph({ type: 'directed' });
 
-        // Nodes
-        if (data.nodes)
+        // Nodes (add with initial size)
+        if (data.nodes) {
             data.nodes.forEach(n => {
                 graph.addNode(n.key, {
                     ...n,
@@ -116,14 +159,51 @@ fetch("data/papers.yaml")
                     y: n.y || Math.random()
                 });
             });
+        }
 
         // Edges
-        if (data.edges)
+        if (data.edges) {
             data.edges.forEach(e => {
                 e.to.forEach(to => {
-                    graph.addEdge(e.from, to, { type: 'arrow', color: '#888', size: 3, weight: 0.5 });
+                    graph.addEdge(e.from, to, { 
+                        type: 'arrow', 
+                        color: '#cbd5e1', 
+                        size: 2, 
+                        weight: 0.5 
+                    });
                 });
             });
+        }
+
+        // Calculate node sizes based on out-degree (number of papers they cite)
+        const outDegrees = {};
+        let maxOutDegree = 0;
+        
+        graph.forEachNode((node) => {
+            const outDegree = graph.outDegree(node);
+            outDegrees[node] = outDegree;
+            maxOutDegree = Math.max(maxOutDegree, outDegree);
+        });
+
+        // Update node sizes based on citations (out-degree)
+        // Size ranges from 4 (no citations) to 16 (most citations)
+        const minSize = 4;
+        const maxSize = 16;
+        
+        graph.forEachNode((node) => {
+            const outDegree = outDegrees[node];
+            let size;
+            
+            if (maxOutDegree === 0) {
+                size = minSize;
+            } else {
+                // Logarithmic scaling for better visual distribution
+                const normalizedDegree = outDegree / maxOutDegree;
+                size = minSize + (maxSize - minSize) * Math.sqrt(normalizedDegree);
+            }
+            
+            graph.setNodeAttribute(node, 'size', size);
+        });
 
         // Create extra edges to pull cluster members together
         const clusterNodes = {};
@@ -133,10 +213,8 @@ fetch("data/papers.yaml")
         });
 
         Object.values(clusterNodes).forEach(nodes => {
-            // Fully connect cluster members with tiny-weight edges
             for (let i = 0; i < nodes.length; i++) {
                 for (let j = i + 1; j < nodes.length; j++) {
-                    // Only if an edge doesn’t exist already
                     if (!graph.hasEdge(nodes[i], nodes[j])) {
                         graph.addEdge(nodes[i], nodes[j], { weight: 1.0, hidden: true });
                     }
@@ -148,15 +226,15 @@ fetch("data/papers.yaml")
         const seedPapers = [];
         let ctr = 8;
         graph.forEachNode((node, attr) => {
-            if (ctr > 0)
-                seedPapers.push(node);
+            if (ctr > 0) seedPapers.push(node);
             ctr--;
-        })
+        });
 
         for (let i = 0; i < seedPapers.length; i++) {
             for (let j = i + 1; j < seedPapers.length; j++) {
-                if (!graph.hasEdge(seedPapers[i], seedPapers[j]))
-                        graph.addEdge(seedPapers[i], seedPapers[j], { weight: 0.5, hidden: true });
+                if (!graph.hasEdge(seedPapers[i], seedPapers[j])) {
+                    graph.addEdge(seedPapers[i], seedPapers[j], { weight: 0.5, hidden: true });
+                }
             }
         }
 
@@ -174,53 +252,84 @@ fetch("data/papers.yaml")
             }
         });
 
+        // Hide loading overlay
+        const loadingEl = document.getElementById('loading');
+        loadingEl.classList.add('hidden');
+
+        // Populate legend
+        populateLegend(graph);
 
         /* -----------------------------
            Render
         --------------------------------*/
         const container = document.getElementById("graph-container");
-        const renderer = new Sigma(graph, container);
-
-        // renderer.on("enterNode", ({ node }) => {
-        //   renderer.setHighlightedNode(node);
-        // });
-
-        // renderer.on("leaveNode", () => {
-        //   renderer.setHighlightedNode(null);
-        // });
-
-        renderer.on("clickNode", ({ node }) => {
-            const a = graph.getNodeAttributes(node);
-            console.log(a);
-            document.getElementById("node-title").innerHTML = `<a href="${a.url}" target="_blank">${a.label}</a>`;
-            document.getElementById("node-meta").innerHTML =
-                `<p>
-                    Authors: ${a.authors}
-                    Venue: ${a.conf} ${a.year || ""}
-                    Cluster: <span style="color: ${clusterColor(a.cluster)}">${a.cluster}</span>
-                </p>`;
-            document.getElementById("node-meta").appendChild(multilineToUL(a.notes));
+        const renderer = new Sigma(graph, container, {
+            renderEdgeLabels: false,
+            defaultNodeColor: '#94a3b8',
+            defaultEdgeColor: '#cbd5e1'
         });
 
-        // const searchInput = document.getElementById("search");
-        // searchInput.addEventListener("input", e => {
-        //     const q = e.target.value.toLowerCase();
-        //     if (!q) return;
+        // Click handler
+        renderer.on("clickNode", ({ node }) => {
+            const attributes = graph.getNodeAttributes(node);
+            showPaperDetails(attributes);
+        });
 
-        //     const found = graph.nodes().find(
-        //         n => graph.getNodeAttribute(n, "label").toLowerCase().includes(q)
-        //     );
-        //     if (!found) return;
+        // Search functionality
+        const searchInput = document.getElementById('search');
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            if (!searchTerm) {
+                // Reset all nodes to normal
+                graph.forEachNode((node) => {
+                    graph.setNodeAttribute(node, 'highlighted', false);
+                    graph.setNodeAttribute(node, 'hidden', false);
+                });
+            } else {
+                // Highlight matching nodes, dim others
+                graph.forEachNode((node, attr) => {
+                    const authorMatch = Array.isArray(attr.authors) 
+                        ? attr.authors.some(author => author.toLowerCase().includes(searchTerm))
+                        : (attr.authors && attr.authors.toLowerCase().includes(searchTerm));
+                    
+                    const matches = attr.label.toLowerCase().includes(searchTerm) ||
+                                  authorMatch ||
+                                  (attr.cluster && attr.cluster.toLowerCase().includes(searchTerm));
+                    
+                    graph.setNodeAttribute(node, 'highlighted', matches);
+                    graph.setNodeAttribute(node, 'hidden', !matches);
+                });
+            }
+            
+            renderer.refresh();
+        });
 
-        //     console.log(found);
+        // Control buttons
+        document.getElementById('zoom-fit').addEventListener('click', () => {
+            renderer.getCamera().animatedReset();
+        });
 
-        //     const cam = renderer.getCamera();
-        //     const pos = graph.getNodeAttributes(found);
-        //     cam.animate(
-        //         { x: pos.x, y: pos.y, ratio: 0.2 },
-        //         { duration: 500 }
-        //     );
-
-        //     console.log(pos);
-        // });
+        document.getElementById('reset-layout').addEventListener('click', () => {
+            // Re-run layout
+            graphologyLibrary.layoutForceAtlas2.assign(graph, {
+                iterations: 200,
+                settings: {
+                    gravity: 1,
+                    linLogMode: false,
+                    outboundAttractionDistribution: true,
+                    adjustSizes: false,
+                    strongGravityMode: false,
+                    scalingRatio: 5,
+                    slowDown: 3
+                }
+            });
+            renderer.refresh();
+            renderer.getCamera().animatedReset();
+        });
+    })
+    .catch(error => {
+        console.error('Error loading graph:', error);
+        const loadingEl = document.getElementById('loading');
+        loadingEl.querySelector('p').textContent = 'Error loading graph data';
     });

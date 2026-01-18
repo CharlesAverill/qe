@@ -274,12 +274,18 @@ nodes:
     url: https://arxiv.org/abs/2003.06458
 
 edges:
-  - from: taktok
-    to:
-      - coqgym
   - from: coqgym
     to:
-      - sepia
-      - tactictoe
-      - holist
-      - gamepad
+      - taktok
+  - from: sepia
+    to:
+      - coqgym
+  - from: tactictoe
+    to:
+      - coqgym
+  - from: holist
+    to:
+      - coqgym
+  - from: gamepad
+    to:
+      - coqgym
