@@ -43,8 +43,27 @@ function hash32(str) {
     return h;
 }
 
+function multilineToUL(text) {
+  const ul = document.createElement("ul");
+
+  text
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .forEach(line => {
+      const li = document.createElement("li");
+      li.textContent = line;
+      ul.appendChild(li);
+    });
+
+  return ul;
+}
+
 // Golden-angle color generator seeded by hash
-function generateColorForLabel(label) {
+function generateColorForLabel(label, toRead=false) {
+    if (toRead)
+        return "#FF0000";
+
     // golden angle in degrees
     const GOLDEN_ANGLE = 137.50776405003785;
 
@@ -70,7 +89,7 @@ function clusterColor(clusterLabel) {
     if (clusterLabel == null) return "#777777"; // fallback
     const key = String(clusterLabel);
     if (_clusterColorCache.has(key)) return _clusterColorCache.get(key);
-    const color = generateColorForLabel(key);
+    const color = generateColorForLabel(key, clusterLabel == "ToRead");
     _clusterColorCache.set(key, color);
     return color;
 }
@@ -101,12 +120,11 @@ fetch("data/papers.yaml")
         // Edges
         if (data.edges)
             data.edges.forEach(e => {
-                graph.addEdge(e.to, e.from, { type: 'arrow', color: '#888', size: 3 });
+                e.to.forEach(to => {
+                    graph.addEdge(e.from, to, { type: 'arrow', color: '#888', size: 3, weight: 0.5 });
+                });
             });
 
-        /* -----------------------------
-           Run ForceAtlas2 layout
-        --------------------------------*/
         // Create extra edges to pull cluster members together
         const clusterNodes = {};
         graph.forEachNode((node, attr) => {
@@ -125,6 +143,22 @@ fetch("data/papers.yaml")
                 }
             }
         });
+
+        // Add cluster for seed papers
+        const seedPapers = [];
+        let ctr = 8;
+        graph.forEachNode((node, attr) => {
+            if (ctr > 0)
+                seedPapers.push(node);
+            ctr--;
+        })
+
+        for (let i = 0; i < seedPapers.length; i++) {
+            for (let j = i + 1; j < seedPapers.length; j++) {
+                if (!graph.hasEdge(seedPapers[i], seedPapers[j]))
+                        graph.addEdge(seedPapers[i], seedPapers[j], { weight: 0.5, hidden: true });
+            }
+        }
 
         // Run ForceAtlas2
         graphologyLibrary.layoutForceAtlas2.assign(graph, {
@@ -157,26 +191,36 @@ fetch("data/papers.yaml")
 
         renderer.on("clickNode", ({ node }) => {
             const a = graph.getNodeAttributes(node);
+            console.log(a);
             document.getElementById("node-title").innerHTML = `<a href="${a.url}" target="_blank">${a.label}</a>`;
-            document.getElementById("node-meta").textContent =
-                `Authors: ${a.authors}\nVenue: ${a.conf} ${a.year || ""}\nCluster: ${a.cluster}`;
+            document.getElementById("node-meta").innerHTML =
+                `<p>
+                    Authors: ${a.authors}
+                    Venue: ${a.conf} ${a.year || ""}
+                    Cluster: <span style="color: ${clusterColor(a.cluster)}">${a.cluster}</span>
+                </p>`;
+            document.getElementById("node-meta").appendChild(multilineToUL(a.notes));
         });
 
-        const searchInput = document.getElementById("search");
-        searchInput.addEventListener("input", e => {
-            const q = e.target.value.toLowerCase();
-            if (!q) return;
+        // const searchInput = document.getElementById("search");
+        // searchInput.addEventListener("input", e => {
+        //     const q = e.target.value.toLowerCase();
+        //     if (!q) return;
 
-            const found = graph.nodes().find(
-                n => graph.getNodeAttribute(n, "label").toLowerCase().includes(q)
-            );
-            if (!found) return;
+        //     const found = graph.nodes().find(
+        //         n => graph.getNodeAttribute(n, "label").toLowerCase().includes(q)
+        //     );
+        //     if (!found) return;
 
-            const cam = renderer.getCamera();
-            const pos = graph.getNodeAttributes(found);
-            cam.animate(
-                { x: pos.x, y: pos.y, ratio: 0.2 },
-                { duration: 500 }
-            );
-        });
+        //     console.log(found);
+
+        //     const cam = renderer.getCamera();
+        //     const pos = graph.getNodeAttributes(found);
+        //     cam.animate(
+        //         { x: pos.x, y: pos.y, ratio: 0.2 },
+        //         { duration: 500 }
+        //     );
+
+        //     console.log(pos);
+        // });
     });

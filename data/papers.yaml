@@ -9,6 +9,9 @@ nodes:
     conf: OOPSLA
     url: https://dl.acm.org/doi/10.1145/3428299
     cluster: LLMAutomation
+    notes: |
+      Proof synthesis technique that looks at proof state and semantics to predict next tactic.
+      Outperforms other similar techniques on large Coq projects of 10k+ theorems
   - key: coqgym
     label: "Learning to Prove Theorems via Interacting with Proof Assistants"
     year: 2019
@@ -16,8 +19,13 @@ nodes:
       - Kaiyu Yang
       - Jia Deng
     conf: ICML
-    url: https://farxiv.org/abs/1905.09381
+    url: https://arxiv.org/abs/1905.09381
     cluster: DataDrivenML
+    notes: |
+      Presents CoqGym - 71k human-written Coq proofs.
+      Presents ASTactic, generates tactic ASTs for proof synthesis.
+      Solves 12.2% of the theorems in the test set.
+      Can be combined with SOTA ATPs (SMT solvers and FOL systems) to bump success rate to 30%.
   - key: llmsurvey
     label: "Proof Automation with Large Language Models"
     year: 2024
@@ -28,6 +36,9 @@ nodes:
     conf: ASE
     url: https://dl.acm.org/doi/10.1145/3691620.3695521
     cluster: LLMAutomation
+    notes: |
+      Analyzes common errors made by GPTs, discovers that they're good at high-level proof structure but bad at low-level tasks.
+      Solution: write-then-repair method of proof generation that combines LLMs and symbolic approaches.
   - key: datalog_provenance
     label: "Provenance-guided synthesis of Datalog programs"
     year: 2019
@@ -40,6 +51,10 @@ nodes:
     conf: POPL
     url: https://dl.acm.org/doi/abs/10.1145/3371130
     cluster: Algorithmic
+    notes: |
+      Generates datalog programs based on input-output specifications.
+      If a counterexample is found for the generated program, the system computes "why-provenenance" that details why the specification is wrong.
+      With SAT solving, the specification is updated with more constraints to fix the errors.
   - key: sisyphus
     label: "Mostly Automated Proof Repair for Verified Libraries"
     year: 2023
@@ -50,6 +65,8 @@ nodes:
     conf: PLDI
     url: https://dl.acm.org/doi/10.1145/3591221
     cluster: LLMAutomation
+    notes: |
+      When updating a program but keeping its specification the same, Sisyphus repairs the proof's invariants to match the new code.
   - key: leandojo
     label: "LeanDojo: Theorem Proving with Retrieval-Augmented Language Models"
     year: 2023
@@ -66,6 +83,9 @@ nodes:
     conf: NeurIPS
     url: https://leandojo.org/leandojo.html
     cluster: LLMAutomation
+    notes: |
+      RAG network using fine-grained annotations to enhance premise selection during tactic prediction.
+      Also exposes that a simple train/test split misrepresents the success of these models, as many proofs and theorems are similar to one another, so the test set may be polluted with nearly-identical samples from the training set.
   - key: malarea
     label: "MaLARea: a Metasystem for Automated Reasoning in Large Theories"
     year: 2007
@@ -74,6 +94,8 @@ nodes:
     conf: ESARLT
     url: https://www.researchgate.net/publication/220806094_MaLARea_a_Metasystem_for_Automated_Reasoning_in_Large_Theories
     cluster: DataDrivenML
+    notes: |
+      First to integrate modern data-driven ML into ATP, won LTB in CASC-2007.
   - key: rippling
     label: "Rippling: a heuristic for guiding inductive proofs"
     year: 1993
@@ -86,7 +108,173 @@ nodes:
     conf: AIJ
     url: https://www.cs.vu.nl/~frankh/postscript/AIJ92.pdf
     cluster: Algorithmic
+    notes: |
+      Extremely significant symbolic AI approach to inductive proof automation, used extensively afterward.
+  - key: pact
+    label: "Proof Artifact Co-training for Theorem Proving with Language Models"
+    year: 2022
+    authors:
+      - Jesse Michael Han
+      - Jason Rute
+      - Yuhuai Wu
+      - Edward W. Ayers
+      - Stanislas Polu
+    conf: ICLR
+    cluster: ToRead
+    url: https://arxiv.org/abs/2102.06203
+  - key: rltp
+    label: "Reinforcement Learning of Theorem Proving"
+    year: 2018
+    authors:
+      - Cezary Kaliszyk
+      - Josef Urban
+      - Henryk Michalewski
+      - Mirek Olšák
+    conf: NeurIPS
+    cluster: ToRead
+    url: https://arxiv.org/abs/1805.07563
+  - key: ml_for_heuristic_opt
+    label: "Machine Learning for Heuristic Optimisation and Premise Selection in Automated Theorem Proving"
+    year: 2023
+    authors:
+      - Edvard K. Holden
+    conf: The University of Manchester
+    cluster: ToRead
+    url: https://www.proquest.com/docview/3059441938
+  - key: formal_premise_selection
+    label: "Formal Premise Selection With Language Models"
+    year: 2022
+    authors:
+      - Szymon Tworkowski
+      - Maciej Mikula
+      - Tomasz Odrzygozdz
+      - Konrad Czechowski
+      - Szymon Antoniak
+      - Albert Q. Jiang
+      - Christian Szegedy
+      - Lukasz Kucinski
+      - Piotr Milos,
+      - Yuhuai Wu
+    conf: AITP
+    cluster: ToRead
+    url: https://aitp-conference.org/2022/abstract/AITP_2022_paper_32.pdf
+  - key: goedel
+    label: "Goedel-Prover-V2: Scaling Formal Theorem Proving with Scaffolded Data Synthesis and Self-Correction"
+    year: 2025
+    authors:
+      - Yong Lin
+      - Shange Tang
+      - Bohan Lyu
+      - Ziran Yang
+      - Jui-Hui Chung
+      - Haoyu Zhao
+      - Lai Jiang
+      - Yihan Geng
+      - Jiawei Ge
+      - Jingruo Sun
+      - Jiayun Wu
+      - Jiri Gesi
+      - Ximing Lu
+      - David Acuna
+      - Kaiyu Yang
+      - Hongzhou Lin
+      - Yejin Choi
+      - Danqi Chen
+      - Sanjeev Arora
+      - Chi Jin
+    conf: arxiv
+    cluster: ToRead
+    url: https://arxiv.org/abs/2508.03613
+  - key: deepseek_prover
+    label: "DeepSeek-Prover-V2: Advancing Formal Mathematical Reasoning via Reinforcement Learning for Subgoal Decomposition"
+    year: 2025
+    authors: 
+      - Z.Z. Ren
+      - Zhihong Shao
+      - Junxiao Song
+      - Huajian Xin
+      - Haocheng Wang
+      - Wanjia Zhao
+      - Liyue Zhang
+      - Zhe Fu
+      - Qihao Zhu
+      - Dejian Yang
+      - Z.F. Wu
+      - Zhibin Gou
+      - Shirong Ma
+      - Hongxuan Tang
+      - Yuxuan Liu
+      - Wenjun Gao
+      - Daya Guo
+      - Chong Ruan
+    conf: arxiv
+    cluster: ToRead
+    url: https://arxiv.org/abs/2504.21801
+  - key: sepia
+    label: "SEPIA: Search for Proofs Using Inferred Automata"
+    year: 2015
+    authors:
+      - Thomas Grandsen
+      - Neil Walkinshaw
+      - Rajeev Raman
+    conf: CADE
+    cluster: ToRead
+    url: https://link.springer.com/chapter/10.1007/978-3-319-21401-6_16
+  - key: tactictoe
+    label: "TacticToe: Learning to Prove with Tactics"
+    year: 2020
+    authors:
+      - Thibault Gautier
+      - Cezary Kaliszyk
+      - Josef Urban
+      - Ramana Kumar
+      - Michael Norrish
+    conf: JAUR
+    cluster: ToRead
+    url: https://link.springer.com/article/10.1007/s10817-020-09580-x
+  - key: holist
+    label: "HOList: An Environment for Machine Learning of Higher-Order Theorem Proving"
+    year: 2019
+    authors:
+      - Kshitij Bansal
+      - Sarah M. Loos
+      - Markus N. Rabe
+      - Christian Szegedy
+      - Stewart Wilcox
+    conf: PMLR
+    cluster: ToRead
+    url: https://arxiv.org/abs/1904.03241
+  - key: gamepad
+    label: "GamePad: A Learning Environment for Theorem Proving"
+    year: 2019
+    authors:
+      - Daniel Huang
+      - Prafulla Dhariwal
+      - Dawn Song
+      - Ilya Sutskever
+    conf: ICLR
+    cluster: ToRead
+    url: https://arxiv.org/abs/1806.00608
+  - key: qed_at_large
+    label: "QED at Large: A Survey of Engineering of Formally Verified Software"
+    year: 2020
+    authors: 
+      - Talia Ringer
+      - Karl Palmskog
+      - Ilya Sergey
+      - Gligoric Milos
+      - Zachary Tatlock
+    conf: FTPL
+    cluster: ToRead
+    url: https://arxiv.org/abs/2003.06458
 
 edges:
   - from: taktok
-    to: coqgym
+    to:
+      - coqgym
+  - from: coqgym
+    to:
+      - sepia
+      - tactictoe
+      - holist
+      - gamepad

@@ -19,7 +19,7 @@ html, body {
 }
 
 #sidebar {
-  width: 320px;
+  width: 30%;
   background: #fff;
   border-left: 1px solid #ddd;
   padding: 16px;
@@ -28,24 +28,28 @@ html, body {
 }
 
 #search {
-  width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-bottom: 12px;
 }
 
-#node-details {
-  margin-top: 16px;
-}
-
 #node-title {
   font-size: 20px;
-  margin: 0 0 8px 0;
+  margin: 0 0 0 0;
 }
 
 #node-meta {
   font-size: 14px;
   line-height: 1.4;
-  white-space: pre-wrap;
+  white-space: preserve-breaks;
+}
+
+#node-meta ul {
+  padding-left: 1em;
+}
+
+#node-meta p {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
