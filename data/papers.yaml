@@ -240,8 +240,12 @@ nodes:
       - Ramana Kumar
       - Michael Norrish
     conf: JAUR
-    cluster: ToRead
+    cluster: DataDrivenML
     url: https://link.springer.com/article/10.1007/s10817-020-09580-x
+    notes: |
+      Uses K-NN for lemma selection
+      Claims to solve 66% of HOL Light's standard library theorems, no info on train/test split
+      Authors pre-select tactics for model to choose from
   - key: holist
     label: "HOList: An Environment for Machine Learning of Higher-Order Theorem Proving"
     year: 2019
@@ -518,4 +522,6 @@ edges:
   - from: tactictoe
     to:
       - malarea
+      - tactician
+      - sepia
 

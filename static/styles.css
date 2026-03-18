@@ -24,7 +24,6 @@ html, body {
   flex: 1;
   position: relative;
   background: radial-gradient(circle at 50% 50%, #ffffff 0%, #f8fafc 100%);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 #graph-container {
@@ -32,6 +31,16 @@ html, body {
   height: 100%;
   background: transparent;
 }
+
+/* ── D3 SVG fills the container ── */
+#graph-container svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Node hover via SVG class (D3 attaches .node-g) ── */
+.node-g { cursor: pointer; }
 
 /* Loading Overlay */
 .loading-overlay {
@@ -45,6 +54,7 @@ html, body {
   transition: opacity 0.3s ease;
 }
 
+/* "hidden" class used by graph.js to dismiss the loader */
 .loading-overlay.hidden {
   opacity: 0;
   pointer-events: none;
@@ -97,13 +107,13 @@ html, body {
   font-weight: 500;
   color: #334155;
   cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 10px 15px rgba(0,0,0,0.05);
   transition: all 0.2s ease;
 }
 
 .control-btn:hover {
   border-color: #a5b4fc;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
   transform: translateY(-1px);
 }
 
@@ -126,7 +136,7 @@ html, body {
   border-radius: 0.75rem;
   padding: 1rem;
   max-width: 18rem;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
   z-index: 10;
 }
 
@@ -168,7 +178,7 @@ html, body {
   border-left: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  box-shadow: -4px 0 6px rgba(0, 0, 0, 0.02);
+  box-shadow: -4px 0 6px rgba(0,0,0,0.02);
 }
 
 /* Search Container */
@@ -189,14 +199,14 @@ html, body {
   border-radius: 0.5rem;
   font-size: 0.875rem;
   background: white;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   transition: all 0.2s ease;
   outline: none;
 }
 
 #search:focus {
   border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
 }
 
 .search-icon {
@@ -260,33 +270,20 @@ html, body {
 
 /* Paper Content */
 .paper-content {
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.25s ease-out;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .paper-title {
-  display: block;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #0f172a;
   line-height: 1.4;
-  margin-bottom: 1.5rem;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.paper-title:hover {
-  color: #4f46e5;
+  margin-bottom: 1.25rem;
 }
 
 /* Metadata Cards */
@@ -337,9 +334,7 @@ html, body {
   border-color: #c7d2fe;
 }
 
-.cluster-label {
-  color: #4338ca;
-}
+.cluster-label { color: #4338ca; }
 
 .cluster-content {
   display: flex;
@@ -359,7 +354,7 @@ html, body {
   font-weight: 500;
 }
 
-/* Notes Container */
+/* Notes */
 .notes-container {
   background: #fffbeb;
   border: 1px solid #fde68a;
@@ -397,7 +392,7 @@ html, body {
   color: #f59e0b;
   font-weight: bold;
   margin-right: 0.5rem;
-  margin-top: 0.125rem;
+  flex-shrink: 0;
 }
 
 /* Read Paper Button */
@@ -413,39 +408,25 @@ html, body {
   font-weight: 500;
   border-radius: 0.5rem;
   text-decoration: none;
-  box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 4px 6px rgba(79,70,229,0.2);
   transition: all 0.2s ease;
 }
 
 .read-paper-btn:hover {
   background: #4338ca;
-  box-shadow: 0 10px 15px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 10px 15px rgba(79,70,229,0.3);
   transform: translateY(-1px);
 }
 
-.read-paper-btn:active {
-  transform: translateY(0);
-}
+.read-paper-btn:active { transform: translateY(0); }
 
 .read-paper-btn svg {
   width: 1rem;
   height: 1rem;
 }
 
-/* Scrollbar Styling */
-.paper-details::-webkit-scrollbar {
-  width: 0.5rem;
-}
-
-.paper-details::-webkit-scrollbar-track {
-  background: #f8fafc;
-}
-
-.paper-details::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 0.25rem;
-}
-
-.paper-details::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
+/* Scrollbar */
+.paper-details::-webkit-scrollbar        { width: 0.5rem; }
+.paper-details::-webkit-scrollbar-track  { background: #f8fafc; }
+.paper-details::-webkit-scrollbar-thumb  { background: #cbd5e1; border-radius: 0.25rem; }
+.paper-details::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
