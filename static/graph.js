@@ -76,11 +76,11 @@ function showPaperDetails(attributes) {
     
     // Update title and link
     const titleEl = document.getElementById('node-title');
-    titleEl.href = attributes.url;
+    // titleEl.href = attributes.url;
     titleEl.textContent = attributes.label;
     
     // Update metadata
-    document.getElementById('node-authors').textContent = attributes.authors || 'N/A';
+    document.getElementById('node-authors').textContent = attributes.authors.toString().replace(',', ', ') || 'N/A';
     document.getElementById('node-venue').textContent = attributes.conf || 'N/A';
     document.getElementById('node-year').textContent = attributes.year || 'N/A';
     
@@ -169,20 +169,33 @@ fetch("data/papers.yaml")
                         type: 'arrow', 
                         color: '#cbd5e1', 
                         size: 2, 
-                        weight: 0.5 
+                        weight: 1
                     });
+                });
+            });
+
+            // Check citation dates to ensure temporal consistency
+            data.edges.forEach(e => {
+                e.to.forEach(to => {
+                    const fromAttr = graph.getNodeAttributes(e.from);
+                    const toAttr = graph.getNodeAttributes(to);
+                    if (fromAttr.year < toAttr.year) {
+                        console.warn(
+                            `Temporal violation: "${e.from}" (${fromAttr.year}) cites "${to}" (${toAttr.year})`
+                        );
+                    }
                 });
             });
         }
 
         // Calculate node sizes based on out-degree (number of papers they cite)
-        const outDegrees = {};
-        let maxOutDegree = 0;
+        const inDegrees = {};
+        let maxInDegree = 0;
         
         graph.forEachNode((node) => {
-            const outDegree = graph.outDegree(node);
-            outDegrees[node] = outDegree;
-            maxOutDegree = Math.max(maxOutDegree, outDegree);
+            const inDegree = graph.inDegree(node);
+            inDegrees[node] = inDegree;
+            maxInDegree = Math.max(maxInDegree, inDegree);
         });
 
         // Update node sizes based on citations (out-degree)
@@ -191,14 +204,14 @@ fetch("data/papers.yaml")
         const maxSize = 16;
         
         graph.forEachNode((node) => {
-            const outDegree = outDegrees[node];
+            const inDegree = inDegrees[node];
             let size;
             
-            if (maxOutDegree === 0) {
+            if (maxInDegree === 0) {
                 size = minSize;
             } else {
                 // Logarithmic scaling for better visual distribution
-                const normalizedDegree = outDegree / maxOutDegree;
+                const normalizedDegree = inDegree / maxInDegree;
                 size = minSize + (maxSize - minSize) * Math.sqrt(normalizedDegree);
             }
             

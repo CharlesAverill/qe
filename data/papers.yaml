@@ -1,5 +1,5 @@
 nodes:
-  - key: taktok
+  - key: tactok
     label: "TacTok: semantics-aware proof synthesis"
     year: 2020
     authors:
@@ -86,7 +86,7 @@ nodes:
       - Ryan Prenger
       - Anima Anandkumar
     conf: NeurIPS
-    url: https://leandojo.org/leandojo.html
+    url: https://arxiv.org/abs/2306.15626
     cluster: LLMAutomation
     notes: |
       RAG network using fine-grained annotations to enhance premise selection during tactic prediction.
@@ -125,8 +125,13 @@ nodes:
       - Edward W. Ayers
       - Stanislas Polu
     conf: ICLR
-    cluster: ToRead
+    cluster: LLMAutomation
     url: https://arxiv.org/abs/2102.06203
+    notes: |
+      Proposes a methodology for extracting LLM training data from kernel-level proof terms for the purposes of tactic prediction
+      PACT includes several language modeling tasks, e.g., next lemma prediction, type prediction, theorem naming, etc.
+      Instruments Lean s.t. LLMs can interface directly with kernel, so no textual tactic prediction
+      Training/test split is split according to the hash of a theorem name, doesn't approach the issues raised by LeanDojo, thus the 35+% success rate is suspicious
   - key: rltp
     label: "Reinforcement Learning of Theorem Proving"
     year: 2018
@@ -187,7 +192,7 @@ nodes:
       - Danqi Chen
       - Sanjeev Arora
       - Chi Jin
-    conf: arxiv
+    conf: arXiv
     cluster: ToRead
     url: https://arxiv.org/abs/2508.03613
   - key: deepseek_prover
@@ -212,7 +217,7 @@ nodes:
       - Wenjun Gao
       - Daya Guo
       - Chong Ruan
-    conf: arxiv
+    conf: arXiv
     cluster: ToRead
     url: https://arxiv.org/abs/2504.21801
   - key: sepia
@@ -227,7 +232,7 @@ nodes:
     url: https://link.springer.com/chapter/10.1007/978-3-319-21401-6_16
   - key: tactictoe
     label: "TacticToe: Learning to Prove with Tactics"
-    year: 2020
+    year: 2018
     authors:
       - Thibault Gautier
       - Cezary Kaliszyk
@@ -247,8 +252,12 @@ nodes:
       - Christian Szegedy
       - Stewart Wilcox
     conf: PMLR
-    cluster: ToRead
+    cluster: DataDrivenML
     url: https://arxiv.org/abs/1904.03241
+    notes: |
+      Provides instrumented HOL Light environment for RL Theorem Prover training
+      30k theorems in dataset, splits respect that goals descended from one another will be similar, but doesn't recognize that theorems in train/test may be similar as in LeanDojo
+      Presents an example tactic prediction implementation, claims ~35% accuracy
   - key: gamepad
     label: "GamePad: A Learning Environment for Theorem Proving"
     year: 2019
@@ -272,20 +281,241 @@ nodes:
     conf: FTPL
     cluster: ToRead
     url: https://arxiv.org/abs/2003.06458
+  - key: gptf
+    label: "Generative Language Modeling for Automated Theorem Proving"
+    year: 2020
+    authors:
+      - Stanislas Polu
+      - Ilya Sutskever
+    conf: arXiv
+    cluster: LLMAutomation
+    url: https://arxiv.org/abs/2009.03393
+    notes: |
+      Pretraining on mathematical data (e.g., arXiv) is better than general internet text
+      Model size scales with performance
+      Claims 56% success rate in tactic prediction on a Metamath dataset with a random train/test split
+  - key: draft_sketch_prove
+    label: "Draft, Sketch, and Prove: Guiding Formal Theorem Provers with Informal Proofs"
+    year: 2022
+    authors:
+      - Albert Q. Jiang
+      - Sean Welleck
+      - Jin Peng Zhou
+      - Wenda Li
+      - Jiacheng Liu
+      - Mateja Jamnik
+      - Timothée Lacroix
+      - Yuhuai Wu
+      - Guillaume Lample
+    conf: arXiv
+    cluster: ToRead
+    url: https://arxiv.org/abs/2210.12283
+  - key: alphaproof
+    label: "Olympiad-level formal mathematical reasoning with reinforcement learning"
+    year: 2025
+    authors:
+      - Thomas Hubert
+      - Rishi Mehta
+      - Laurent Sartran
+      - Miklós Z. Horváth
+      - Goran Žužić
+      - Eric Wieser
+      - Aja Huang
+      - Julian Schrittwieser
+      - Yannick Schroecker
+      - Hussain Masoom
+      - Ottavia Bertolli
+      - Tom Zahavy
+      - Amol Mandhane
+      - Jessica Yung
+      - Iuliya Beloshapka
+      - Borja Ibarz
+      - Vivek Veeriah
+      - Lei Yu
+      - Oliver Nash
+      - Paul Lezeau
+      - Salvatore Mercuri
+      - Calle Sönne
+      - Bhavik Mehta
+      - Alex Davies
+      - Daniel Zheng
+      - Fabian Pedregosa
+      - Yin Li
+      - Ingrid von Glehn
+      - Mark Rowland
+      - Samuel Albanie
+      - Ameya Velingker
+      - Simon Schmitt
+      - Edward Lockhart
+      - Edward Hughes
+      - Henryk Michalewski
+      - Nicolas Sonnerat
+      - Demis Hassabis
+      - Pushmeet Kohli
+      - David Silver 
+    conf: Nature
+    cluster: ToRead
+    url: https://www.nature.com/articles/s41586-025-09833-y
+  - key: alphageometry2
+    label: "Gold-medalist Performance in Solving Olympiad Geometry with AlphaGeometry2"
+    year: 2025
+    authors:
+      - Yuri Chervonyi
+      - Trieu H. Trinh
+      - Miroslav Olšák
+      - Xiaomeng Yang
+      - Hoang Nguyen
+      - Marcelo Menegali
+      - Junehyuk Jung
+      - Junsu Kim
+      - Vikas Verma
+      - Quoc V. Le
+      - Thang Luong
+    conf: JMLR
+    cluster: ToRead
+    url: https://arxiv.org/abs/2502.03544
+  - key: lean_copilot
+    label: "Lean Copilot: Large Language Models as Copilots for Theorem Proving in Lean"
+    year: 2024
+    authors:
+      - Peiyang Song
+      - Kaiyu Yang
+      - Anima Anandkumar
+    conf: arXiv
+    cluster: ToRead
+    url: https://arxiv.org/abs/2404.12534
+  - key: minif2f
+    label: "MiniF2F: a cross-system benchmark for formal Olympiad-level mathematics"
+    year: 2021
+    authors:
+      - Kunhao Zheng
+      - Jesse Michael Han
+      - Stanislas Polu
+    conf: arXiv
+    cluster: ToRead
+    url: https://arxiv.org/abs/2109.00110
+  - key: autoformalization_llms
+    label: "Autoformalization with Large Language Models"
+    year: 2022
+    authors:
+      - Yuhuai Wu
+      - Albert Qiaochu Jiang
+      - Wenda Li
+      - Markus Rabe
+      - Charles Staats
+      - Mateja Jamnik
+      - Christian Szegedy
+    conf: NeurIPS
+    cluster: ToRead
+    url: https://proceedings.neurips.cc/paper_files/paper/2022/hash/d0c6bc641a56bebee9d985b937307367-Abstract-Conference.html
+  - key: tactician
+    label: "The Tactician: A Seamless, Interactive Tactic Learner and Prover for Coq"
+    year: 2020
+    authors:
+      - Lasse Blaauwbroek
+      - Josef Urban
+      - Herman Geuvers 
+    conf: ICM
+    cluster: ToRead
+    url: https://link.springer.com/chapter/10.1007/978-3-030-53518-6_17
+  - key: proverbot
+    label: "Generating Correctness Proofs with Neural Networks"
+    year: 2020
+    authors:
+      - Alex Sanchez-Stern
+      - Yousef Alhessi
+      - Lawrence Saul
+      - Sorin Lerner
+    conf: arXiv
+    cluster: ToRead
+    url: https://arxiv.org/abs/1907.07794
+  - key: hypertree_ps
+    label: "HyperTree Proof Search for Neural Theorem Proving"
+    year: 2022
+    authors:
+      - Guillaume Lample
+      - Timothee Lacroix
+      - Marie-Anne Lachaux
+      - Aurelien Rodriguez
+      - Amaury Hayat
+      - Thibaut Lavril
+      - Gabriel Ebner
+      - Xavier Martinet
+    conf: NeurIPS
+    cluster: ToRead
+    url: https://proceedings.neurips.cc/paper_files/paper/2022/hash/a8901c5e85fb8e1823bbf0f755053672-Abstract-Conference.html
+  - key: deepmath
+    label: "DeepMath - Deep Sequence Models for Premise Selection"
+    year: 2016
+    authors:
+      - Alex A. Alemi
+      - Francois Chollet
+      - Niklas Een
+      - Geoffrey Irving
+      - Christian Szegedy
+      - Josef Urban
+    conf: arXiv
+    cluster: ToRead
+    url: https://arxiv.org/abs/1606.04442
 
 edges:
-  - from: coqgym
-    to:
-      - taktok
-  - from: sepia
+  - from: tactok
     to:
       - coqgym
-  - from: tactictoe
+  - from: coqgym
     to:
+      - sepia
+      - tactictoe
+      - holist
+      - gamepad
+  - from: leandojo
+    to:
+      - gptf
+      - minif2f
+      - pact
+      - holist
+      - coqgym
+      - formal_premise_selection
+      - tactictoe
+      - hypertree_ps
+      - gamepad
+  - from: llmsurvey
+    to:
+      - coqgym
+      - tactok
+      - leandojo
+      - minif2f
+      - gptf
+  - from: pact
+    to:
+      - gptf
+      - tactictoe
+      - tactician
+      - holist
+      - coqgym
+      - proverbot
+  - from: minif2f
+    to:
+      - gptf
+  - from: deepseek_prover
+    to:
+      - minif2f
+      - leandojo
+  - from: draft_sketch_prove
+    to:
+      - minif2f
+      - holist
+  - from: gptf
+    to:
+      - holist
+      - gamepad
       - coqgym
   - from: holist
     to:
-      - coqgym
-  - from: gamepad
+      - tactictoe
+      - gamepad
+      - deepmath
+  - from: tactictoe
     to:
-      - coqgym
+      - malarea
+
