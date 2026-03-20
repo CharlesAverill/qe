@@ -120,7 +120,7 @@ nodes:
       Extremely significant symbolic AI approach to inductive proof automation, used extensively afterward
   - key: pact
     label: "Proof Artifact Co-training for Theorem Proving with Language Models"
-    year: 2022
+    year: 2021
     authors:
       - Jesse Michael Han
       - Jason Rute
@@ -411,8 +411,11 @@ nodes:
       - Jesse Michael Han
       - Stanislas Polu
     conf: arXiv
-    cluster: ToRead
+    cluster: Environment
     url: https://arxiv.org/abs/2109.00110
+    notes: |
+      Cross-framework database of mathematical theorem statements from high school to Olympiad level
+      GPT-f success rate < 2%, PACT success rate ~11%, GPT-f/PACT success rate 25-30%
   - key: autoformalization_llms
     label: "Autoformalization with Large Language Models"
     year: 2022
@@ -446,8 +449,11 @@ nodes:
       - Lawrence Saul
       - Sorin Lerner
     conf: arXiv
-    cluster: ToRead
+    cluster: ClassicalML
     url: https://arxiv.org/abs/1907.07794
+    notes: |
+      Proverbot9001 is claimed to prove 28% of the theorems in CompCert, 13-20% of concat, float, and zfc
+      Tactic prediction uses heuristic premise selection
   - key: hypertree_ps
     label: "HyperTree Proof Search for Neural Theorem Proving"
     year: 2022
@@ -476,6 +482,122 @@ nodes:
     conf: arXiv
     cluster: ToRead
     url: https://arxiv.org/abs/1606.04442
+  - key: no_imitation
+    label: "Learning to Reason in Large Theories without Imitation"
+    year: 2019
+    authors:
+      - Kshitij Bansal
+      - Christian Szegedy
+      - Markus N. Rabe
+      - Sarah M. Loos
+      - Viktor Toman
+    conf: arXiv
+    cluster: ClassicalML
+    url: https://arxiv.org/abs/1905.10501
+    notes: |
+      Proposes a method to learn how to prove theorems without imitation learning
+      Proposal is retrieval-augmented reinforcement learning
+      During training, unnecessary premises are cleared from the context
+      Does not tackle the issue of conjecturing new lemmas and generalization
+  - key: rango
+    label: "Rango: Adaptive retrieval-augmented proving for automated software verification"
+    year: 2024
+    authors:
+      - Kyle Thompson
+      - Nuno Saavedra
+      - Pedro Carrott
+      - Kevin Fisher
+      - Alex Sanchez-Stern
+      - Yuriy Brun
+      - João F. Ferreira
+      - Sorin Lerner
+      - Emily First
+    conf: arXiv
+    cluster: ToRead
+    url: https://arxiv.org/abs/2412.14063
+  - key: nqthm
+    label: "The Boyer-Moore theorem prover and its interactive enhancement☆"
+    year: 1995
+    authors:
+      - R.S. Boyer
+      - M. Kaufmann
+      - J.S. Moore
+    conf: CAMWA
+    cluster: ToRead
+    url: https://www.sciencedirect.com/science/article/pii/0898122194002157
+  - key: acl2
+    label: "ACL2: an industrial strength version of Nqthm"
+    year: 1996
+    authors:
+      - M. Kaufmann
+      - J. Strother Moore
+    conf: CMPASS
+    cluster: ToRead
+    url: https://ieeexplore.ieee.org/abstract/document/507872
+  - key: isaplanner
+    label: "IsaPlanner: A Prototype Proof Planner in Isabelle"
+    year: 2003
+    authors:
+      - Lucas Dixon
+      - Jacques Fleuriot
+    conf: CADE
+    cluster: ToRead
+    url: https://link.springer.com/chapter/10.1007/978-3-540-45085-6_22
+  - key: hipster
+    label: "Hipster: Integrating Theory Exploration in a Proof Assistant"
+    year: 2014
+    authors:
+      - Moa Johansson
+      - Dan Rosén
+      - Nicholas Smallbone
+      - Koen Claessen 
+    conf: CICM
+    cluster: ToRead
+    url: https://link.springer.com/chapter/10.1007/978-3-319-08434-3_9
+  - key: tip
+    label: "TIP: Tons of Inductive Problems"
+    year: 2015
+    authors:
+      - Koen Claessen
+      - Moa Johansson
+      - Dan Rosén
+      - Nicholas Smallbone
+    conf: CICM
+    cluster: ToRead
+    url: https://link.springer.com/chapter/10.1007/978-3-319-20615-8_23
+  - key: productive_failure
+    label: "Productive use of failure in inductive proof"
+    year: 1996
+    authors:
+      - Andrew Ireland 
+      - Alan Bundy 
+    conf: JAR
+    cluster: ToRead
+    url: https://link.springer.com/article/10.1007/BF00244460
+  - key: sgs
+    label: "Syntax-Guided Synthesis"
+    year: 2013
+    authors:
+      - Rajeev Alur
+      - Rastislav Bodik
+      - Garvit Juniwal
+      - Milo M. K. Martin
+      - Mukund Raghothaman
+      - Sanjit A. Seshia
+    conf: FMCAD
+    cluster: ToRead
+    url: https://ieeexplore.ieee.org/abstract/document/6679385
+  - key: gensynth
+    label: "GENSYNTH: Synthesizing Datalog Programs without Language Bias"
+    year: 2021
+    authors:
+      - Jonathan Mendelson
+      - Aaditya Naik
+      - Mukund Raghothaman
+      - Mayur Naik 
+    conf: AAAI
+    cluster: ToRead
+    url: https://ojs.aaai.org/index.php/AAAI/article/view/16799
 
 edges:
   - from: tactok
@@ -498,6 +620,7 @@ edges:
       - tactictoe
       - hypertree_ps
       - gamepad
+      - no_imitation
   - from: llmsurvey
     to:
       - coqgym
@@ -513,9 +636,14 @@ edges:
       - holist
       - coqgym
       - proverbot
+      - no_imitation
   - from: minif2f
     to:
       - gptf
+      - pact
+      - holist
+      - no_imitation
+      - coqgym
   - from: deepseek_prover
     to:
       - minif2f
@@ -524,11 +652,13 @@ edges:
     to:
       - minif2f
       - holist
+      - no_imitation
   - from: gptf
     to:
       - holist
       - gamepad
       - coqgym
+      - no_imitation
   - from: holist
     to:
       - tactictoe
@@ -546,4 +676,24 @@ edges:
     to:
       - tactician
       - qed_at_large
+  - from: autoformalization_llms
+    to:
+      - no_imitation
+  - from: rango
+    to:
+      - no_imitation
+  - from: no_imitation
+    to:
+      - holist
+      - gamepad
+      - coqgym
+      - proverbot
+      - tactictoe
+  - from: proverbot
+    to:
+      - deepmath
+      - holist
+      - tactictoe
+      - gamepad
+      - coqgym
 

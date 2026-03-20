@@ -5,7 +5,7 @@ import jsyaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs'
    Theme
 ───────────────────────────────────────────── */
 const NODE_MIN       = 5;
-const NODE_MAX       = 18;
+const NODE_MAX       = 32;
 const LABEL_SIZE     = 11;
 const LABEL_MAX_W    = 120;
 const LABEL_FONT     = `500 ${LABEL_SIZE}px "DM Mono", monospace`;
@@ -486,12 +486,21 @@ function showSidebar(d, nodes, links, nodeMap) {
     }
 
     /* read paper button */
-    const btn = document.getElementById('read-paper-btn');
+    const btn1 = document.getElementById('read-paper-btn');
     if (d.url) {
-        btn.href = d.url;
-        btn.style.display = 'flex';
+        btn1.href = d.url;
+        btn1.style.display = 'flex';
     } else {
-        btn.style.display = 'none';
+        btn1.style.display = 'none';
+    }
+
+    /* gscholar button */
+    const btn2 = document.getElementById('gscholar-btn');
+    if (d.url) {
+        btn2.href = "https://scholar.google.com/scholar?q=" + encodeURIComponent(d.label);
+        btn2.style.display = 'flex';
+    } else {
+        btn2.style.display = 'none';
     }
 }
 
