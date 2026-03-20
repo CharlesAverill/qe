@@ -18,6 +18,7 @@ const LINK_HL        = '#6366f1';
 
 // https://coolors.co/6366f1-10b981-ee7674-f59e0b-94a3b8
 const CLUSTER_COLORS = {
+    Survey        : '#763DCB',
     LLM           : '#6366f1',
     ClassicalML   : '#10b981',
     Algorithmic   : '#f59e0b',

@@ -480,8 +480,13 @@ nodes:
       - Christian Szegedy
       - Josef Urban
     conf: arXiv
-    cluster: ToRead
+    cluster: ClassicalML
     url: https://arxiv.org/abs/1606.04442
+    notes: |
+      First neural network approach to premise selection without hand-engineered features
+      Training data is theorems in Mizar known to be provable by ATPs, random train/test split
+      Evaluate LSTMs, CNNs, GRUs as embedding layers for the core network, found that CNNs > CNN-LSTMs = GRUs > LSTMs
+      CNNs achieved 30-70% accuracy rate for Mizar theorems known to be provable by ATPs
   - key: no_imitation
     label: "Learning to Reason in Large Theories without Imitation"
     year: 2019
@@ -598,7 +603,29 @@ nodes:
     conf: AAAI
     cluster: ToRead
     url: https://ojs.aaai.org/index.php/AAAI/article/view/16799
-
+  - key: arlt
+    label: "Theorem Proving in Large Formal Mathematics as an Emerging AI Field"
+    year: 2013
+    authors:
+      - Josef Urban
+      - Jiří Vyskočil 
+    conf: ARM
+    cluster: ToRead
+    url: https://link.springer.com/chapter/10.1007/978-3-642-36675-8_13
+  - key: hammering
+    label: "Hammering towards QED"
+    year: 2016
+    authors:
+      - Jasmin C. Blanchette
+      - Cezary Kaliszyk
+      - Lawrence C. Paulson
+      - Josef Urban
+    conf: JFR
+    cluster: Survey
+    url: https://doi.org/10.6092/issn.1972-5787/4593 
+    notes: |
+      Survey on Hammers, semi-intelligent brute-force methods of ATP
+      Hammers generally consist of 4 phases: 1) premise selection 2) ITP -> ATP parsing 3) solving 4) ATP -> ITP generation
 edges:
   - from: tactok
     to:
@@ -606,6 +633,7 @@ edges:
       - tactictoe
       - gamepad
       - deepmath
+      - hammering
   - from: coqgym
     to:
       - sepia
@@ -624,6 +652,7 @@ edges:
       - hypertree_ps
       - gamepad
       - no_imitation
+      - hammering
   - from: llmsurvey
     to:
       - coqgym
@@ -640,6 +669,7 @@ edges:
       - coqgym
       - proverbot
       - no_imitation
+      - hammering
   - from: minif2f
     to:
       - gptf
@@ -672,6 +702,7 @@ edges:
     to:
       - malarea
       - sepia
+      - hammering
   - from: gamepad
     to:
       - deepmath
@@ -700,4 +731,10 @@ edges:
       - tactictoe
       - gamepad
       - coqgym
+  - from: deepmath
+    to:
+      - hammering
+  - from: sepia
+    to:
+      - hammering
 
