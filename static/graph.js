@@ -16,10 +16,12 @@ const LABEL_GAP      = 5;
 const LINK_BASE      = '#cbd5e1';
 const LINK_HL        = '#6366f1';
 
+// https://coolors.co/6366f1-10b981-ee7674-f59e0b-94a3b8
 const CLUSTER_COLORS = {
-    LLMAutomation : '#6366f1',
-    DataDrivenML  : '#10b981',
+    LLM           : '#6366f1',
+    ClassicalML   : '#10b981',
     Algorithmic   : '#f59e0b',
+    Environment   : '#EE7674',
     ToRead        : '#94a3b8',
 };
 function clusterColor(c) { return CLUSTER_COLORS[c] ?? '#94a3b8'; }
@@ -62,7 +64,7 @@ function wrapLabel(text) {
 /* ─────────────────────────────────────────────
    Boot
 ───────────────────────────────────────────── */
-fetch('data/papers.yaml')
+fetch('/qe/data/papers.yaml')
     .then(r => r.text())
     .then(yaml => build(jsyaml.load(yaml)))
     .catch(err => {
@@ -313,7 +315,11 @@ function build(data) {
                      || authorMatch
                      || (d.cluster ?? '').toLowerCase().includes(term)
                      || String(d.year ?? '').includes(term)
-                     || String(d.notes ?? '').includes(term);
+                     || String(d.notes ?? '').toLowerCase().includes(term);
+            console.log(String(d.label));
+            console.log(d);
+            console.log(String(d.notes).includes(term));
+            console.log('=====');
             return hit ? 1 : 0.1;
         });
     });

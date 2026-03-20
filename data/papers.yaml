@@ -8,15 +8,15 @@ nodes:
       - Arjun Guha
     conf: OOPSLA
     url: https://dl.acm.org/doi/10.1145/3428299
-    cluster: LLMAutomation
+    cluster: LLM
     notes: |
-      Proof synthesis technique that looks at proof state and semantics to predict next tactic.
-      Outperforms ASTactic on large Coq projects of 10k+ theorems.
-      Does not outperform CoqHammer.
-      Success rate of 12.9%.
-      Can be used as a complement to ASTactic, CoqHammer, and similar approaches.
-      Successful at reasoning about higher-order logic where other tools fail.
-      Not all proofs require expert knowledge of all *tokens* in the proof script, only the tactics.
+      Proof synthesis technique that looks at proof state and semantics to predict next tactic
+      Outperforms ASTactic on large Coq projects of 10k+ theorems
+      Does not outperform CoqHammer
+      Success rate of 12.9%
+      Can be used as a complement to ASTactic, CoqHammer, and similar approaches
+      Successful at reasoning about higher-order logic where other tools fail
+      Not all proofs require expert knowledge of all *tokens* in the proof script, only the tactics
   - key: coqgym
     label: "Learning to Prove Theorems via Interacting with Proof Assistants"
     year: 2019
@@ -25,12 +25,12 @@ nodes:
       - Jia Deng
     conf: ICML
     url: https://arxiv.org/abs/1905.09381
-    cluster: DataDrivenML
+    cluster: ClassicalML
     notes: |
-      Presents CoqGym - 71k human-written Coq proofs.
-      Presents ASTactic, generates tactic ASTs for proof synthesis.
-      Solves 12.2% of the theorems in the test set.
-      Can be combined with SOTA ATPs (SMT solvers and FOL systems) to bump success rate to 30%.
+      Presents CoqGym - 71k human-written Coq proofs
+      Presents ASTactic encoder-decoder model, generates tactic ASTs for proof synthesis
+      Solves 12.2% of the theorems in the test set
+      Can be combined with SOTA ATPs (SMT solvers and FOL systems) to bump success rate to 30%
   - key: llmsurvey
     label: "Proof Automation with Large Language Models"
     year: 2024
@@ -40,10 +40,11 @@ nodes:
       - Tianyi Zhang
     conf: ASE
     url: https://dl.acm.org/doi/10.1145/3691620.3695521
-    cluster: LLMAutomation
+    cluster: LLM
     notes: |
-      Analyzes common errors made by GPTs, discovers that they're good at high-level proof structure but bad at low-level tasks.
-      Solution: write-then-repair method of proof generation that combines LLMs and symbolic approaches.
+      Analyzes common errors made by GPTs, discovers that they're good at high-level proof structure but bad at low-level tasks
+      Solution: write-then-repair method "PALM" of proof generation that combines LLMs and symbolic approaches
+      30-40% success rate on CoqGym using GPT-3/4, Llama-3
   - key: datalog_provenance
     label: "Provenance-guided synthesis of Datalog programs"
     year: 2019
@@ -57,9 +58,9 @@ nodes:
     url: https://dl.acm.org/doi/abs/10.1145/3371130
     cluster: Algorithmic
     notes: |
-      Generates datalog programs based on input-output specifications.
-      If a counterexample is found for the generated program, the system computes "why-provenenance" that details why the specification is wrong.
-      With SAT solving, the specification is updated with more constraints to fix the errors.
+      Generates datalog programs based on input-output specifications
+      If a counterexample is found for the generated program, the system computes "why-provenenance" that details why the specification is wrong
+      With SAT solving, the specification is updated with more constraints to fix the errors
   - key: sisyphus
     label: "Mostly Automated Proof Repair for Verified Libraries"
     year: 2023
@@ -69,9 +70,9 @@ nodes:
       - Ilya Sergey
     conf: PLDI
     url: https://dl.acm.org/doi/10.1145/3591221
-    cluster: LLMAutomation
+    cluster: LLM
     notes: |
-      When updating a program but keeping its specification the same, Sisyphus repairs the proof's invariants to match the new code.
+      When updating a program but keeping its specification the same, Sisyphus repairs the proof's invariants to match the new code
   - key: leandojo
     label: "LeanDojo: Theorem Proving with Retrieval-Augmented Language Models"
     year: 2023
@@ -87,10 +88,11 @@ nodes:
       - Anima Anandkumar
     conf: NeurIPS
     url: https://arxiv.org/abs/2306.15626
-    cluster: LLMAutomation
+    cluster: Environment
     notes: |
-      RAG network using fine-grained annotations to enhance premise selection during tactic prediction.
-      Also exposes that a simple train/test split misrepresents the success of these models, as many proofs and theorems are similar to one another, so the test set may be polluted with nearly-identical samples from the training set.
+      RAG network using fine-grained annotations to enhance premise selection during tactic prediction
+      Also exposes that a simple train/test split misrepresents the success of these models, as many proofs and theorems are similar to one another, so the test set may be polluted with nearly-identical samples from the training set
+      Better approach to dataset splitting is to ensure that test set proofs use at least one premise that is never used in a training set proof
   - key: malarea
     label: "MaLARea: a Metasystem for Automated Reasoning in Large Theories"
     year: 2007
@@ -98,9 +100,10 @@ nodes:
       - Josef Urban
     conf: ESARLT
     url: https://www.researchgate.net/publication/220806094_MaLARea_a_Metasystem_for_Automated_Reasoning_in_Large_Theories
-    cluster: DataDrivenML
+    cluster: ClassicalML
     notes: |
-      First to integrate modern data-driven ML into ATP, won LTB in CASC-2007.
+      First to integrate modern data-driven ML into ATP, won LTB in CASC-2007
+      Depends on the SNoW linear classification model
   - key: rippling
     label: "Rippling: a heuristic for guiding inductive proofs"
     year: 1993
@@ -114,7 +117,7 @@ nodes:
     url: https://www.cs.vu.nl/~frankh/postscript/AIJ92.pdf
     cluster: Algorithmic
     notes: |
-      Extremely significant symbolic AI approach to inductive proof automation, used extensively afterward.
+      Extremely significant symbolic AI approach to inductive proof automation, used extensively afterward
   - key: pact
     label: "Proof Artifact Co-training for Theorem Proving with Language Models"
     year: 2022
@@ -125,11 +128,11 @@ nodes:
       - Edward W. Ayers
       - Stanislas Polu
     conf: ICLR
-    cluster: LLMAutomation
+    cluster: LLM
     url: https://arxiv.org/abs/2102.06203
     notes: |
       Proposes a methodology for extracting LLM training data from kernel-level proof terms for the purposes of tactic prediction
-      PACT includes several language modeling tasks, e.g., next lemma prediction, type prediction, theorem naming, etc.
+      PACT includes several language modeling tasks, e.g., next lemma prediction, type prediction, theorem naming, etc
       Instruments Lean s.t. LLMs can interface directly with kernel, so no textual tactic prediction
       Training/test split is split according to the hash of a theorem name, doesn't approach the issues raised by LeanDojo, thus the 35+% success rate is suspicious
   - key: rltp
@@ -228,8 +231,13 @@ nodes:
       - Neil Walkinshaw
       - Rajeev Raman
     conf: CADE
-    cluster: ToRead
+    cluster: ClassicalML
     url: https://link.springer.com/chapter/10.1007/978-3-319-21401-6_16
+    notes: |
+      Uses MINT to infer a FSM from proof traces
+      SEPIA FSMs are essentially search trees of already-seen proofs
+      Solves ~15% of theorems on average, many 0% cases for certain theory libraries
+      Doesn't seem like it would scale well (computationally) with more acquired knowledge
   - key: tactictoe
     label: "TacticToe: Learning to Prove with Tactics"
     year: 2018
@@ -240,7 +248,7 @@ nodes:
       - Ramana Kumar
       - Michael Norrish
     conf: JAUR
-    cluster: DataDrivenML
+    cluster: ClassicalML
     url: https://link.springer.com/article/10.1007/s10817-020-09580-x
     notes: |
       Uses K-NN for lemma selection
@@ -256,7 +264,7 @@ nodes:
       - Christian Szegedy
       - Stewart Wilcox
     conf: PMLR
-    cluster: DataDrivenML
+    cluster: Environment
     url: https://arxiv.org/abs/1904.03241
     notes: |
       Provides instrumented HOL Light environment for RL Theorem Prover training
@@ -271,8 +279,15 @@ nodes:
       - Dawn Song
       - Ilya Sutskever
     conf: ICLR
-    cluster: ToRead
+    cluster: Environment
     url: https://arxiv.org/abs/1806.00608
+    notes: |
+      System for synthesizing proofs for supervised ML training data
+      Considers tactic prediction as well as *position prediction*, predicting the number of tactics remaining
+      Encodes proof term ASTs as inputs for RNN learning
+      95% proof accuracy on synthesized algebraic rewriting problems
+      40-60% proof accuracy on Feit-Thompson proof dataset using various ML architectures - likely case of test set poisoning
+      Tactic prediction dataset seems over-engineered, giving special treatment to specific tactics such as reflexivity
   - key: qed_at_large
     label: "QED at Large: A Survey of Engineering of Formally Verified Software"
     year: 2020
@@ -292,7 +307,7 @@ nodes:
       - Stanislas Polu
       - Ilya Sutskever
     conf: arXiv
-    cluster: LLMAutomation
+    cluster: LLM
     url: https://arxiv.org/abs/2009.03393
     notes: |
       Pretraining on mathematical data (e.g., arXiv) is better than general internet text
@@ -522,6 +537,13 @@ edges:
   - from: tactictoe
     to:
       - malarea
-      - tactician
       - sepia
+  - from: gamepad
+    to:
+      - deepmath
+      - tactictoe
+  - from: sisyphus
+    to:
+      - tactician
+      - qed_at_large
 
