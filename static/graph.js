@@ -514,7 +514,7 @@ function hideSidebar() {
 ───────────────────────────────────────────── */
 function buildLegend(nodes) {
     const clusters = [...new Set(nodes.map(n => n.cluster).filter(Boolean))];
-    document.getElementById('legend-items').innerHTML = clusters.map(c => `
+    document.getElementById('legend-items').innerHTML = clusters.map(c => c == "ToRead" ? '' : `
         <div class="legend-item">
             <div class="legend-dot" style="background:${clusterColor(c)}"></div>
             <span>${c}</span>

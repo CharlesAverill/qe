@@ -312,7 +312,7 @@ nodes:
     notes: |
       Pretraining on mathematical data (e.g., arXiv) is better than general internet text
       Model size scales with performance
-      Claims 56% success rate in tactic prediction on a Metamath dataset with a random train/test split
+      GPT-f claims 56% success rate in tactic prediction on a Metamath dataset with a random train/test split
   - key: draft_sketch_prove
     label: "Draft, Sketch, and Prove: Guiding Formal Theorem Provers with Informal Proofs"
     year: 2022
@@ -603,6 +603,9 @@ edges:
   - from: tactok
     to:
       - coqgym
+      - tactictoe
+      - gamepad
+      - deepmath
   - from: coqgym
     to:
       - sepia
@@ -659,6 +662,7 @@ edges:
       - gamepad
       - coqgym
       - no_imitation
+      - deepmath
   - from: holist
     to:
       - tactictoe
