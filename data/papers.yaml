@@ -441,8 +441,9 @@ nodes:
     cluster: ClassicalML
     url: https://link.springer.com/chapter/10.1007/978-3-030-53518-6_17
     notes: |
-      k-NN approach involving a semantic tactic database
+      k-NN approach involving a semantic tactic database constructed from training data
       Provides tactics `suggest` and `search` to suggest and search for appropriate tactics
+      No evaluation statistics
   - key: proverbot
     label: "Generating Correctness Proofs with Neural Networks"
     year: 2020
@@ -637,8 +638,12 @@ nodes:
       - Łukasz Czajka
       - Cezary Kaliszyk
     conf: JAR
-    cluster: ToRead
+    cluster: ClassicalML
     url: https://link.springer.com/article/10.1007/S10817-018-9458-4
+    notes: |
+      Hammer for Coq that translates dependently-typed expressions to first-order logic expressions
+      Evaluated on Coq standard library, claims 17-40% success rate
+      k-NN classifier for premise selection
 
 edges:
   - from: tactok
@@ -670,6 +675,8 @@ edges:
       - no_imitation
       - hammering
       - coqhammer
+      - draft_sketch_prove
+      - autoformalization_llms
   - from: llmsurvey
     to:
       - coqgym
@@ -699,6 +706,9 @@ edges:
     to:
       - minif2f
       - leandojo
+      - draft_sketch_prove
+      - hypertree_ps
+      - autoformalization_llms
   - from: draft_sketch_prove
     to:
       - minif2f
@@ -736,6 +746,9 @@ edges:
     to:
       - no_imitation
       - coqhammer
+      - draft_sketch_prove
+      - hypertree_ps
+      - autoformalization_llms
   - from: no_imitation
     to:
       - holist
@@ -754,9 +767,6 @@ edges:
   - from: deepmath
     to:
       - hammering
-  - from: sepia
-    to:
-      - hammering
   - from: tactician
     to:
       - tactictoe
@@ -771,3 +781,38 @@ edges:
   - from: lean_copilot
     to:
       - coqhammer
+  - from: coqhammer
+    to:
+      - hammering
+  - from: alphaproof
+    to:
+      - draft_sketch_prove
+      - hypertree_ps
+      - deepseek_prover
+      - autoformalization_llms
+  - from: goedel
+    to:
+      - draft_sketch_prove
+      - hypertree_ps
+      - deepseek_prover
+      - autoformalization_llms
+
+clusters:
+  - key: LLM
+    description: "Papers using Large Language Models as the primary proof automation mechanism, including fine-tuned provers, RAG-based approaches, and RL-trained LLMs"
+    color: "#6366f1"
+  - key: ClassicalML
+    description: "Non-LLM machine learning approaches: k-NN, RNNs, shallow networks, etc"
+    color: "#10b981"
+  - key: Algorithmic
+    description: "Symbolic AI, search heuristics, and rule-based systems with no learned components"
+    color: "#f59e0b"
+  - key: Environment
+    description: "Papers whose primary contribution is a dataset, benchmark, or instrumented ITP environment for training and evaluating ML systems"
+    color: "#EE7674"
+  - key: Survey
+    description: "Papers that summarize a body of work"
+    color: "#763DCB"
+  - key: ToRead
+    description: "Papers I haven't read yet. How did you find this message?"
+    color: "#94a3b8"

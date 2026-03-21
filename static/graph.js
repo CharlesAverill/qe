@@ -4,28 +4,17 @@ import jsyaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs'
 /* ─────────────────────────────────────────────
    Theme
 ───────────────────────────────────────────── */
-const NODE_MIN       = 5;
-const NODE_MAX       = 32;
-const LABEL_SIZE     = 11;
-const LABEL_MAX_W    = 120;
-const LABEL_FONT     = `500 ${LABEL_SIZE}px "DM Mono", monospace`;
-const LABEL_PAD_X    = 6;
-const LABEL_PAD_Y    = 3;
-const LABEL_LINE_H   = LABEL_SIZE * 1.3;  // line height for wrapped lines
-const LABEL_GAP      = 5;
-const LINK_BASE      = '#cbd5e1';
-const LINK_HL        = '#6366f1';
-
-// https://coolors.co/6366f1-10b981-ee7674-f59e0b-94a3b8
-const CLUSTER_COLORS = {
-    Survey        : '#763DCB',
-    LLM           : '#6366f1',
-    ClassicalML   : '#10b981',
-    Algorithmic   : '#f59e0b',
-    Environment   : '#EE7674',
-    ToRead        : '#94a3b8',
-};
-function clusterColor(c) { return CLUSTER_COLORS[c] ?? '#94a3b8'; }
+const NODE_MIN = 5;
+const NODE_MAX = 32;
+const LABEL_SIZE = 11;
+const LABEL_MAX_W = 120;
+const LABEL_FONT = `500 ${LABEL_SIZE}px "DM Mono", monospace`;
+const LABEL_PAD_X = 6;
+const LABEL_PAD_Y = 3;
+const LABEL_LINE_H = LABEL_SIZE * 1.3;  // line height for wrapped lines
+const LABEL_GAP = 5;
+const LINK_BASE = '#cbd5e1';
+const LINK_HL = '#6366f1';
 
 /* ─────────────────────────────────────────────
    Label wrapping
@@ -36,11 +25,19 @@ function clusterColor(c) { return CLUSTER_COLORS[c] ?? '#94a3b8'; }
 const _mCtx = document.createElement('canvas').getContext('2d');
 _mCtx.font = LABEL_FONT;
 
+function lightenColor(hex, amount = 0.6) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const blend = c => Math.round(c + (255 - c) * amount);
+    return `rgb(${blend(r)}, ${blend(g)}, ${blend(b)})`;
+}
+
 function wrapLabel(text) {
     const maxInner = LABEL_MAX_W - LABEL_PAD_X * 2;  // available text width
-    const words    = (text ?? '').split(/\s+/);
-    const lines    = [];
-    let   current  = '';
+    const words = (text ?? '').split(/\s+/);
+    const lines = [];
+    let current = '';
 
     for (const word of words) {
         const candidate = current ? current + ' ' + word : word;
@@ -55,9 +52,9 @@ function wrapLabel(text) {
     }
     if (current) lines.push(current);
 
-    const lineW  = Math.max(...lines.map(l => _mCtx.measureText(l).width));
-    const pillW  = lineW + LABEL_PAD_X * 2;
-    const pillH  = LABEL_PAD_Y * 2 + lines.length * LABEL_LINE_H;
+    const lineW = Math.max(...lines.map(l => _mCtx.measureText(l).width));
+    const pillW = lineW + LABEL_PAD_X * 2;
+    const pillH = LABEL_PAD_Y * 2 + lines.length * LABEL_LINE_H;
 
     return { lines, pillW, pillH };
 }
@@ -74,6 +71,12 @@ fetch('/qe/data/papers.yaml')
         if (el) el.querySelector('p').textContent = 'Failed to load data.';
     });
 
+var clusters = [];
+
+function clusterColor(cluster) {
+    return clusters.filter(x => x.key == cluster)[0].color;
+}
+
 /* ─────────────────────────────────────────────
    Build
 ───────────────────────────────────────────── */
@@ -85,6 +88,8 @@ function build(data) {
         nodeMap.set(n.key, node);
         return node;
     });
+
+    clusters = data.clusters;
 
     /* links + temporal check */
     const links = [];
@@ -104,15 +109,15 @@ function build(data) {
     links.forEach(l => inDeg.set(l.target, (inDeg.get(l.target) ?? 0) + 1));
     const maxDeg = Math.max(...inDeg.values(), 1);
     nodes.forEach(n => {
-        n.r      = NODE_MIN + (NODE_MAX - NODE_MIN) * Math.sqrt((inDeg.get(n.id) ?? 0) / maxDeg);
-        const w  = wrapLabel(n.label ?? n.key);
-        n.wrap   = w;           // { lines, pillW, pillH }
+        n.r = NODE_MIN + (NODE_MAX - NODE_MIN) * Math.sqrt((inDeg.get(n.id) ?? 0) / maxDeg);
+        const w = wrapLabel(n.label ?? n.key);
+        n.wrap = w;           // { lines, pillW, pillH }
         n.labelW = w.pillW;     // used for collision radius
         n.labelH = w.pillH;     // used for zoom-to-fit bounding box
     });
 
-    /* legend */
-    buildLegend(nodes);
+    /* cluster meta from yaml */
+    const clusterMeta = new Map((data.clusters ?? []).map(c => [c.key, c]));
 
     /* ── SVG ── */
     const container = document.getElementById('graph-container');
@@ -138,7 +143,7 @@ function build(data) {
 
     /* zoom layer */
     const zoomG = svg.append('g');
-    const zoom  = d3.zoom().scaleExtent([0.08, 6])
+    const zoom = d3.zoom().scaleExtent([0.08, 6])
         .on('zoom', e => zoomG.attr('transform', e.transform));
     svg.call(zoom);
 
@@ -235,9 +240,9 @@ function build(data) {
         .attr('stroke-width', 0.75);
 
     /* label text — one <tspan> per wrapped line */
-    nodeG.each(function(d) {
-        const g   = d3.select(this);
-        const ly  = d.r + LABEL_GAP;
+    nodeG.each(function (d) {
+        const g = d3.select(this);
+        const ly = d.r + LABEL_GAP;
         const { lines, pillW, pillH } = d.wrap;
 
         g.select('.label-bg')
@@ -288,15 +293,14 @@ function build(data) {
 
     /* ── Hover glow ── */
     nodeG
-        .on('mouseenter', function(event, d) {
+        .on('mouseenter', function (event, d) {
             d3.select(this).select('.label-bg')
                 .attr('fill', '#eef2ff')
                 .attr('stroke', '#a5b4fc');
             d3.select(this).select('.label-text').attr('fill', '#4338ca');
-            d3.select(this).select('.node-circle').attr('fill-opacity', 0.28).attr('stroke-width', 2);
+            d3.select(this).select('.node-circle').attr('fill-opacity', 1).attr('stroke-width', 2);
         })
-        .on('mouseleave', function(event, d) {
-            // only reset if node is not selected
+        .on('mouseleave', function (event, d) {
             if (!d._selected) {
                 d3.select(this).select('.label-bg').attr('fill', 'white').attr('stroke', '#e2e8f0');
                 d3.select(this).select('.label-text').attr('fill', '#334155');
@@ -304,24 +308,41 @@ function build(data) {
             }
         });
 
+    /* ── Legend (built here so nodeG/linkSel are in scope for cluster clicks) ── */
+    buildLegend(nodes, clusterMeta, nodeG, linkSel, links, nodeMap);
+
     /* ── Search ── */
     document.getElementById('search').addEventListener('input', e => {
         const term = e.target.value.trim().toLowerCase();
-        nodeG.attr('opacity', d => {
-            if (!term) return 1;
+        nodeG.each(function (d) {
+            if (!term) {
+                const baseColor = clusterColor(d.cluster);
+                d3.select(this).attr('opacity', 1);
+                d3.select(this).select('.node-circle').attr('stroke', baseColor).attr('fill', baseColor);
+                d3.select(this).select('.label-bg').attr('fill', 'white').attr('stroke', '#e2e8f0');
+                d3.select(this).select('.label-text').attr('fill', '#334155');
+                return;
+            }
+
             const authorMatch = Array.isArray(d.authors)
                 ? d.authors.some(a => a.toLowerCase().includes(term))
                 : (d.authors ?? '').toLowerCase().includes(term);
             const hit = (d.label ?? '').toLowerCase().includes(term)
-                     || authorMatch
-                     || (d.cluster ?? '').toLowerCase().includes(term)
-                     || String(d.year ?? '').includes(term)
-                     || String(d.notes ?? '').toLowerCase().includes(term);
-            console.log(String(d.label));
-            console.log(d);
-            console.log(String(d.notes).includes(term));
-            console.log('=====');
-            return hit ? 1 : 0.1;
+                || authorMatch
+                || (d.cluster ?? '').toLowerCase().includes(term)
+                || String(d.year ?? '').includes(term)
+                || String(d.notes ?? '').toLowerCase().includes(term);
+
+            const baseColor = clusterColor(d.cluster);
+            const dimmed = !hit;
+            d3.select(this).select('.node-circle')
+                .attr('stroke', dimmed ? lightenColor(baseColor) : baseColor)
+                .attr('fill', dimmed ? lightenColor(baseColor) : baseColor);
+            d3.select(this).select('.label-bg')
+                .attr('fill', dimmed ? '#f8fafc' : 'white')
+                .attr('stroke', '#e2e8f0');
+            d3.select(this).select('.label-text')
+                .attr('fill', dimmed ? '#cbd5e1' : '#334155');
         });
     });
 
@@ -330,20 +351,20 @@ function build(data) {
         const pad = 60;
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
         nodes.forEach(n => {
-            const left  = n.x - n.labelW / 2;
+            const left = n.x - n.labelW / 2;
             const right = n.x + n.labelW / 2;
-            const top   = n.y - n.r;
-            const bot   = n.y + n.r + n.labelH + LABEL_GAP;
-            if (left  < minX) minX = left;
+            const top = n.y - n.r;
+            const bot = n.y + n.r + n.labelH + LABEL_GAP;
+            if (left < minX) minX = left;
             if (right > maxX) maxX = right;
-            if (top   < minY) minY = top;
-            if (bot   > maxY) maxY = bot;
+            if (top < minY) minY = top;
+            if (bot > maxY) maxY = bot;
         });
-        const gW    = maxX - minX || 1;
-        const gH    = maxY - minY || 1;
+        const gW = maxX - minX || 1;
+        const gH = maxY - minY || 1;
         const scale = Math.min((W - pad * 2) / gW, (H - pad * 2) / gH, 2);
-        const tx    = W / 2 - scale * (minX + gW / 2);
-        const ty    = H / 2 - scale * (minY + gH / 2);
+        const tx = W / 2 - scale * (minX + gW / 2);
+        const ty = H / 2 - scale * (minY + gH / 2);
         svg.transition().duration(duration)
             .call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
     }
@@ -413,14 +434,25 @@ function highlight(d, nodeG, linkSel) {
         if (nodeId(l.target) === d.id) connected.add(nodeId(l.source));
     });
 
-    nodeG.attr('opacity', n => connected.has(n.id) ? 1 : 0.1);
+    nodeG.each(function (n) {
+        const dimmed = !connected.has(n.id);
+        const baseColor = clusterColor(n.cluster);
+        d3.select(this).select('.node-circle')
+            .attr('stroke', dimmed ? lightenColor(baseColor) : baseColor)
+            .attr('fill', dimmed ? lightenColor(baseColor) : baseColor);
+        d3.select(this).select('.label-bg')
+            .attr('fill', dimmed ? '#f8fafc' : 'white')
+            .attr('stroke', dimmed ? '#e2e8f0' : '#e2e8f0');
+        d3.select(this).select('.label-text')
+            .attr('fill', dimmed ? '#cbd5e1' : '#334155');
+    });
 
     // highlight selected node pill
-    nodeG.each(function(n) {
+    nodeG.each(function (n) {
         if (n.id === d.id) {
             d3.select(this).select('.label-bg').attr('fill', '#eef2ff').attr('stroke', '#a5b4fc');
             d3.select(this).select('.label-text').attr('fill', '#4338ca');
-            d3.select(this).select('.node-circle').attr('stroke-width', 2.5).attr('fill-opacity', 0.28);
+            d3.select(this).select('.node-circle').attr('stroke-width', 2.5);
         }
     });
 
@@ -436,13 +468,15 @@ function highlight(d, nodeG, linkSel) {
 
 function clearHighlight(nodeG, linkSel) {
     nodeG.each(n => { n._selected = false; });
-    nodeG
-        .attr('opacity', 1)
-        .each(function() {
-            d3.select(this).select('.label-bg').attr('fill', 'white').attr('stroke', '#e2e8f0');
-            d3.select(this).select('.label-text').attr('fill', '#334155');
-            d3.select(this).select('.node-circle').attr('stroke-width', 1.5).attr('fill-opacity', 1.0);
-        });
+    nodeG.attr('opacity', 1).each(function (n) {
+        const baseColor = clusterColor(n.cluster);
+        d3.select(this).select('.node-circle')
+            .attr('fill', baseColor)
+            .attr('stroke', baseColor)
+            .attr('stroke-width', 1.5);
+        d3.select(this).select('.label-bg').attr('fill', 'white').attr('stroke', '#e2e8f0');
+        d3.select(this).select('.label-text').attr('fill', '#334155');
+    });
     linkSel
         .attr('stroke', LINK_BASE)
         .attr('stroke-width', 1)
@@ -453,8 +487,9 @@ function clearHighlight(nodeG, linkSel) {
    Sidebar — populates the existing HTML elements
 ───────────────────────────────────────────── */
 function showSidebar(d, nodes, links, nodeMap) {
-    document.getElementById('empty-state').style.display   = 'none';
+    document.getElementById('empty-state').style.display = 'none';
     document.getElementById('paper-content').style.display = 'block';
+    document.getElementById('cluster-panel').style.display = 'none';
 
     document.getElementById('node-title').textContent = d.label ?? d.key;
 
@@ -462,14 +497,14 @@ function showSidebar(d, nodes, links, nodeMap) {
         ? d.authors.join(', ')
         : (d.authors ?? 'N/A');
     document.getElementById('node-authors').textContent = authors;
-    document.getElementById('node-venue').textContent   = d.conf ?? 'N/A';
-    document.getElementById('node-year').textContent    = d.year ?? 'N/A';
+    document.getElementById('node-venue').textContent = d.conf ?? 'N/A';
+    document.getElementById('node-year').textContent = d.year ?? 'N/A';
 
     const color = clusterColor(d.cluster);
     document.getElementById('cluster-dot').style.backgroundColor = color;
     const clusterNameEl = document.getElementById('node-cluster');
-    clusterNameEl.textContent  = d.cluster ?? 'Uncategorized';
-    clusterNameEl.style.color  = color;
+    clusterNameEl.textContent = d.cluster ?? 'Uncategorized';
+    clusterNameEl.style.color = color;
 
     /* notes */
     const notesList = document.getElementById('node-notes');
@@ -506,19 +541,146 @@ function showSidebar(d, nodes, links, nodeMap) {
 }
 
 function hideSidebar() {
-    document.getElementById('empty-state').style.display   = 'flex';
+    document.getElementById('empty-state').style.display = 'flex';
     document.getElementById('paper-content').style.display = 'none';
+    document.getElementById('cluster-panel').style.display = 'none';
 }
 
 /* ─────────────────────────────────────────────
-   Legend
+   Legend — clicking a cluster highlights it and
+   opens the cluster stats panel
 ───────────────────────────────────────────── */
-function buildLegend(nodes) {
-    const clusters = [...new Set(nodes.map(n => n.cluster).filter(Boolean))];
-    document.getElementById('legend-items').innerHTML = clusters.map(c => c == "ToRead" ? '' : `
-        <div class="legend-item">
+function buildLegend(nodes, clusterMeta, nodeG, linkSel, links, nodeMap) {
+    const clusters = [...new Set(nodes.map(n => n.cluster).filter(Boolean))]
+        .filter(c => c !== 'ToRead');
+
+    document.getElementById('legend-items').innerHTML = clusters.map(c => `
+        <div class="legend-item" data-cluster="${c}" style="cursor:pointer">
             <div class="legend-dot" style="background:${clusterColor(c)}"></div>
             <span>${c}</span>
         </div>`
     ).join('');
+
+    document.querySelectorAll('.legend-item[data-cluster]').forEach(el => {
+        el.addEventListener('click', e => {
+            e.stopPropagation();
+            const c = el.dataset.cluster;
+            highlightCluster(c, nodeG, linkSel);
+            showClusterPanel(c, nodes, links, clusterMeta);
+        });
+    });
+}
+
+/* ─────────────────────────────────────────────
+   Cluster highlight — dims everything outside
+   the cluster and its cross-cluster edges
+───────────────────────────────────────────── */
+function highlightCluster(cluster, nodeG, linkSel) {
+    nodeG.each(n => { n._selected = false; });
+
+    const clusterNodeIds = new Set();
+    nodeG.each(n => { if (n.cluster === cluster) clusterNodeIds.add(n.id); });
+
+    nodeG.attr('opacity', 1).each(function (n) {
+        const inCluster = n.cluster === cluster;
+        const baseColor = clusterColor(n.cluster);
+        d3.select(this).select('.node-circle')
+            .attr('stroke', inCluster ? baseColor : lightenColor(baseColor))
+            .attr('fill', inCluster ? baseColor : lightenColor(baseColor))
+            .attr('stroke-width', inCluster ? 2.5 : 1.5);
+        d3.select(this).select('.label-bg')
+            .attr('fill', inCluster ? '#eef2ff' : '#f8fafc')
+            .attr('stroke', inCluster ? '#a5b4fc' : '#e2e8f0');
+        d3.select(this).select('.label-text')
+            .attr('fill', inCluster ? '#4338ca' : '#cbd5e1');
+    });
+
+    linkSel
+        .attr('stroke', l => {
+            const sid = nodeId(l.source), tid = nodeId(l.target);
+            return (clusterNodeIds.has(sid) || clusterNodeIds.has(tid)) ? LINK_HL : LINK_BASE;
+        })
+        .attr('stroke-width', l => {
+            const sid = nodeId(l.source), tid = nodeId(l.target);
+            return (clusterNodeIds.has(sid) || clusterNodeIds.has(tid)) ? 2 : 1;
+        })
+        .attr('marker-end', l => {
+            const sid = nodeId(l.source), tid = nodeId(l.target);
+            return (clusterNodeIds.has(sid) || clusterNodeIds.has(tid))
+                ? 'url(#arrow-hl)' : 'url(#arrow)';
+        });
+}
+
+/* ─────────────────────────────────────────────
+   Cluster stats panel
+───────────────────────────────────────────── */
+function showClusterPanel(cluster, nodes, links, clusterMeta) {
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('paper-content').style.display = 'none';
+    document.getElementById('cluster-panel').style.display = 'block';
+
+    const color = clusterColor(cluster);
+    const meta = clusterMeta.get(cluster) ?? {};
+    const members = nodes.filter(n => n.cluster === cluster);
+    const memberIds = new Set(members.map(n => n.id));
+
+    /* header */
+    const nameEl = document.getElementById('cluster-panel-name');
+    nameEl.textContent = cluster;
+    nameEl.style.color = color;
+    document.getElementById('cluster-panel-dot').style.background = color;
+    document.getElementById('cluster-panel-desc').textContent =
+        meta.description ?? '';
+
+    /* ── stats ── */
+
+    // in-degree: edges coming INTO cluster nodes from anywhere
+    let indegree = 0, outdegree = 0;
+    links.forEach(l => {
+        const sid = nodeId(l.source), tid = nodeId(l.target);
+        if (memberIds.has(tid)) indegree++;
+        if (memberIds.has(sid)) outdegree++;
+    });
+
+    // year range
+    const years = members.map(n => n.year).filter(Boolean).sort((a, b) => a - b);
+    const earliest = years[0] ?? '—';
+    const latest = years[years.length - 1] ?? '—';
+
+    // most common authors (only authors with > 1 paper in cluster)
+    const authorCount = new Map();
+    members.forEach(n => {
+        const auths = Array.isArray(n.authors) ? n.authors : [];
+        auths.forEach(a => authorCount.set(a, (authorCount.get(a) ?? 0) + 1));
+    });
+    const repeatAuthors = [...authorCount.entries()]
+        .filter(([, count]) => count > 1)
+        .sort((a, b) => b[1] - a[1]);
+
+    document.getElementById('cluster-stat-indegree').textContent = indegree;
+    document.getElementById('cluster-stat-outdegree').textContent = outdegree;
+    document.getElementById('cluster-stat-papers').textContent = members.length;
+    document.getElementById('cluster-stat-years').textContent =
+        earliest === latest ? earliest : `${earliest} – ${latest}`;
+
+    const authorsEl = document.getElementById('cluster-stat-authors-row');
+    const authorsValEl = document.getElementById('cluster-stat-authors');
+    if (repeatAuthors.length > 0) {
+        authorsValEl.innerHTML = repeatAuthors
+            .map(([a, n]) => `<span class="author-tag"><a href="https://scholar.google.com/citations?view_op=search_authors&mauthors=${a.replaceAll(" ", "+")}" target="_blank">${a}</a> <span class="author-count">(${n})</span></span>`)
+            .join('');
+        authorsEl.style.display = 'block';
+    } else {
+        authorsEl.style.display = 'none';
+    }
+
+    /* paper list */
+    const listEl = document.getElementById('cluster-paper-list');
+    listEl.innerHTML = '';
+    members.sort((a, b) => (a.year ?? 0) - (b.year ?? 0)).forEach(n => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="cp-year">${n.year ?? '?'}</span>
+                        <span class="cp-title">${n.label ?? n.key}</span>`;
+        listEl.appendChild(li);
+    });
 }

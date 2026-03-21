@@ -430,3 +430,71 @@ html, body {
 .paper-details::-webkit-scrollbar-track  { background: #f8fafc; }
 .paper-details::-webkit-scrollbar-thumb  { background: #cbd5e1; border-radius: 0.25rem; }
 .paper-details::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+.cluster-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+ 
+.cluster-panel-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+ 
+.cluster-panel-desc {
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+ 
+.cluster-paper-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+ 
+.cluster-paper-list li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+ 
+.cp-year {
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+}
+ 
+.cp-title {
+  color: #334155;
+}
+ 
+.author-tag {
+  display: inline-block;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.75rem;
+  color: #475569;
+  margin: 2px 2px 2px 0;
+}
+
+.author-tag > a {
+  text-decoration: none;
+}
+ 
+.author-count {
+  color: #94a3b8;
+}
