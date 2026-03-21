@@ -438,8 +438,11 @@ nodes:
       - Josef Urban
       - Herman Geuvers 
     conf: ICM
-    cluster: ToRead
+    cluster: ClassicalML
     url: https://link.springer.com/chapter/10.1007/978-3-030-53518-6_17
+    notes: |
+      k-NN approach involving a semantic tactic database
+      Provides tactics `suggest` and `search` to suggest and search for appropriate tactics
   - key: proverbot
     label: "Generating Correctness Proofs with Neural Networks"
     year: 2020
@@ -626,6 +629,16 @@ nodes:
     notes: |
       Survey on Hammers, semi-intelligent brute-force methods of ATP
       Hammers generally consist of 4 phases: 1) premise selection 2) ITP -> ATP parsing 3) solving 4) ATP -> ITP generation
+  - key: coqhammer
+    label: "Hammer for Coq: Automation for Dependent Type Theory"
+    year: 2018
+    authors:
+      - Łukasz Czajka
+      - Cezary Kaliszyk
+    conf: JAR
+    cluster: ToRead
+    url: https://link.springer.com/article/10.1007/S10817-018-9458-4
+
 edges:
   - from: tactok
     to:
@@ -634,12 +647,14 @@ edges:
       - gamepad
       - deepmath
       - hammering
+      - coqhammer
   - from: coqgym
     to:
       - sepia
       - tactictoe
       - holist
       - gamepad
+      - coqhammer
   - from: leandojo
     to:
       - gptf
@@ -653,6 +668,7 @@ edges:
       - gamepad
       - no_imitation
       - hammering
+      - coqhammer
   - from: llmsurvey
     to:
       - coqgym
@@ -660,6 +676,7 @@ edges:
       - leandojo
       - minif2f
       - gptf
+      - coqhammer
   - from: pact
     to:
       - gptf
@@ -717,6 +734,7 @@ edges:
   - from: rango
     to:
       - no_imitation
+      - coqhammer
   - from: no_imitation
     to:
       - holist
@@ -731,10 +749,24 @@ edges:
       - tactictoe
       - gamepad
       - coqgym
+      - coqhammer
   - from: deepmath
     to:
       - hammering
   - from: sepia
     to:
       - hammering
-
+  - from: tactician
+    to:
+      - tactictoe
+      - sepia
+      - coqgym
+      - gamepad
+      - proverbot
+      - coqhammer
+  - from: qed_at_large
+    to:
+      - coqhammer
+  - from: lean_copilot
+    to:
+      - coqhammer
