@@ -629,6 +629,7 @@ nodes:
     notes: |
       Survey on Hammers, semi-intelligent brute-force methods of ATP
       Hammers generally consist of 4 phases: 1) premise selection 2) ITP -> ATP parsing 3) solving 4) ATP -> ITP generation
+      Recounts history of hammers, benchmarks, approaches
   - key: coqhammer
     label: "Hammer for Coq: Automation for Dependent Type Theory"
     year: 2018
