@@ -1,0 +1,163 @@
+edges:
+  - from: tactok
+    to:
+      - coqgym
+      - tactictoe
+      - gamepad
+      - deepmath
+      - hammering
+      - coqhammer
+  - from: coqgym
+    to:
+      - sepia
+      - tactictoe
+      - holist
+      - gamepad
+      - coqhammer
+  - from: leandojo
+    to:
+      - gptf
+      - minif2f
+      - pact
+      - holist
+      - coqgym
+      - formal_premise_selection
+      - tactictoe
+      - hypertree_ps
+      - gamepad
+      - no_imitation
+      - hammering
+      - coqhammer
+      - draft_sketch_prove
+      - autoformalization_llms
+      - qed_at_large
+  - from: llmsurvey
+    to:
+      - coqgym
+      - tactok
+      - leandojo
+      - minif2f
+      - gptf
+      - coqhammer
+  - from: pact
+    to:
+      - gptf
+      - tactictoe
+      - tactician
+      - holist
+      - coqgym
+      - proverbot
+      - no_imitation
+      - hammering
+  - from: minif2f
+    to:
+      - gptf
+      - pact
+      - holist
+      - no_imitation
+      - coqgym
+  - from: deepseek_prover
+    to:
+      - minif2f
+      - leandojo
+      - draft_sketch_prove
+      - hypertree_ps
+      - autoformalization_llms
+  - from: draft_sketch_prove
+    to:
+      - minif2f
+      - holist
+      - no_imitation
+  - from: gptf
+    to:
+      - holist
+      - gamepad
+      - coqgym
+      - no_imitation
+      - deepmath
+  - from: holist
+    to:
+      - tactictoe
+      - gamepad
+      - deepmath
+  - from: tactictoe
+    to:
+      - malarea
+      - sepia
+      - hammering
+  - from: gamepad
+    to:
+      - deepmath
+      - tactictoe
+  - from: sisyphus
+    to:
+      - tactician
+      - qed_at_large
+  - from: autoformalization_llms
+    to:
+      - no_imitation
+  - from: rango
+    to:
+      - no_imitation
+      - coqhammer
+      - draft_sketch_prove
+      - hypertree_ps
+      - autoformalization_llms
+  - from: no_imitation
+    to:
+      - holist
+      - gamepad
+      - coqgym
+      - proverbot
+      - tactictoe
+  - from: proverbot
+    to:
+      - deepmath
+      - holist
+      - tactictoe
+      - gamepad
+      - coqgym
+      - coqhammer
+  - from: deepmath
+    to:
+      - hammering
+  - from: tactician
+    to:
+      - tactictoe
+      - sepia
+      - coqgym
+      - gamepad
+      - proverbot
+      - coqhammer
+  - from: qed_at_large
+    to:
+      - coqhammer
+      - acl2
+      - hammering
+  - from: lean_copilot
+    to:
+      - coqhammer
+  - from: coqhammer
+    to:
+      - hammering
+  - from: alphaproof
+    to:
+      - draft_sketch_prove
+      - hypertree_ps
+      - deepseek_prover
+      - autoformalization_llms
+  - from: goedel
+    to:
+      - draft_sketch_prove
+      - hypertree_ps
+      - deepseek_prover
+      - autoformalization_llms
+  - from: ilp_survey
+    to:
+      - datalog_provenance
+  - from: productive_failure
+    to:
+      - rippling
+  - from: nqthm
+    to:
+      - rippling

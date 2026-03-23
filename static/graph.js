@@ -62,14 +62,24 @@ function wrapLabel(text) {
 /* ─────────────────────────────────────────────
    Boot
 ───────────────────────────────────────────── */
-fetch('/qe/data/papers.yaml')
-    .then(r => r.text())
-    .then(yaml => build(jsyaml.load(yaml)))
-    .catch(err => {
-        console.error(err);
-        const el = document.getElementById('loading');
-        if (el) el.querySelector('p').textContent = 'Failed to load data.';
+Promise.all([
+    fetch('/qe/data/papers.yaml').then(r => r.text()),
+    fetch('/qe/data/edges.yaml').then(r => r.text()),
+    fetch('/qe/data/clusters.yaml').then(r => r.text()),
+]).then(([papersYaml, edgesYaml, clustersYaml]) => {
+    const papers   = jsyaml.load(papersYaml);
+    const edges    = jsyaml.load(edgesYaml);
+    const clustersDef = jsyaml.load(clustersYaml);
+    build({
+        nodes:    papers.nodes,
+        edges:    edges.edges,
+        clusters: clustersDef.clusters,
     });
+}).catch(err => {
+    console.error(err);
+    const el = document.getElementById('loading');
+    if (el) el.querySelector('p').textContent = 'Failed to load data.';
+});
 
 var clusters = [];
 
@@ -210,6 +220,10 @@ function build(data) {
         .attr('stroke-width', 1)
         .attr('marker-end', 'url(#arrow)');
 
+    /* ── Multi-select state ── */
+    const selectedNodes = new Set();
+    let lastSingleSelected = null;  // tracks the node from a plain click
+
     /* ── Node groups ── */
     const nodeG = nodeLayer.selectAll('g.node')
         .data(nodes, d => d.id)
@@ -218,8 +232,33 @@ function build(data) {
         .call(dragBehaviour(sim))
         .on('click', (event, d) => {
             event.stopPropagation();
-            highlight(d, nodeG, linkSel);
-            showSidebar(d, nodes, links, nodeMap);
+            if (event.ctrlKey || event.metaKey) {
+                // First ctrl+click after a plain click: seed selection with
+                // the previously highlighted node so both end up selected
+                if (selectedNodes.size === 0 && lastSingleSelected) {
+                    selectedNodes.add(lastSingleSelected);
+                }
+                // Toggle the ctrl+clicked node
+                if (selectedNodes.has(d.id)) {
+                    selectedNodes.delete(d.id);
+                } else {
+                    selectedNodes.add(d.id);
+                }
+                lastSingleSelected = null;
+                if (selectedNodes.size === 0) {
+                    clearHighlight(nodeG, linkSel);
+                    hideSidebar();
+                } else {
+                    highlightSelection(selectedNodes, nodeG, linkSel);
+                    showSelectionPanel(selectedNodes, nodes, links);
+                }
+            } else {
+                // Regular click: clear multi-select, highlight single node
+                selectedNodes.clear();
+                lastSingleSelected = d.id;
+                highlight(d, nodeG, linkSel);
+                showSidebar(d, nodes, links, nodeMap);
+            }
         });
 
     /* circle */
@@ -287,6 +326,8 @@ function build(data) {
 
     /* ── Click background → deselect ── */
     svg.on('click', () => {
+        selectedNodes.clear();
+        lastSingleSelected = null;
         clearHighlight(nodeG, linkSel);
         hideSidebar();
     });
@@ -551,13 +592,13 @@ function hideSidebar() {
    opens the cluster stats panel
 ───────────────────────────────────────────── */
 function buildLegend(nodes, clusterMeta, nodeG, linkSel, links, nodeMap) {
-    const clusters = [...new Set(nodes.map(n => n.cluster).filter(Boolean))]
+    const cluster_ids = [...new Set(nodes.map(n => n.cluster).filter(Boolean))]
         .filter(c => c !== 'ToRead');
 
-    document.getElementById('legend-items').innerHTML = clusters.map(c => `
+    document.getElementById('legend-items').innerHTML = cluster_ids.map(c => `
         <div class="legend-item" data-cluster="${c}" style="cursor:pointer">
             <div class="legend-dot" style="background:${clusterColor(c)}"></div>
-            <span>${c}</span>
+            <span>${clusters.filter(n => n.key === c)[0].label}</span>
         </div>`
     ).join('');
 
@@ -568,6 +609,106 @@ function buildLegend(nodes, clusterMeta, nodeG, linkSel, links, nodeMap) {
             highlightCluster(c, nodeG, linkSel);
             showClusterPanel(c, nodes, links, clusterMeta);
         });
+    });
+}
+
+/* ─────────────────────────────────────────────
+   Custom selection highlight (ctrl+click)
+───────────────────────────────────────────── */
+function highlightSelection(selectedIds, nodeG, linkSel) {
+    nodeG.attr('opacity', 1).each(function(n) {
+        const selected = selectedIds.has(n.id);
+        const baseColor = clusterColor(n.cluster);
+        d3.select(this).select('.node-circle')
+            .attr('stroke', selected ? baseColor : lightenColor(baseColor))
+            .attr('fill',   selected ? baseColor : lightenColor(baseColor))
+            .attr('stroke-width', selected ? 2.5 : 1.5);
+        d3.select(this).select('.label-bg')
+            .attr('fill',   selected ? '#eef2ff' : '#f8fafc')
+            .attr('stroke', selected ? '#a5b4fc' : '#e2e8f0');
+        d3.select(this).select('.label-text')
+            .attr('fill', selected ? '#4338ca' : '#cbd5e1');
+    });
+
+    linkSel
+        .attr('stroke', l => {
+            const sid = nodeId(l.source), tid = nodeId(l.target);
+            return (selectedIds.has(sid) && selectedIds.has(tid)) ? LINK_HL : LINK_BASE;
+        })
+        .attr('stroke-width', l => {
+            const sid = nodeId(l.source), tid = nodeId(l.target);
+            return (selectedIds.has(sid) && selectedIds.has(tid)) ? 2 : 1;
+        })
+        .attr('marker-end', l => {
+            const sid = nodeId(l.source), tid = nodeId(l.target);
+            return (selectedIds.has(sid) && selectedIds.has(tid))
+                ? 'url(#arrow-hl)' : 'url(#arrow)';
+        });
+}
+
+/* ─────────────────────────────────────────────
+   Custom selection stats panel
+───────────────────────────────────────────── */
+function showSelectionPanel(selectedIds, nodes, links) {
+    document.getElementById('empty-state').style.display    = 'none';
+    document.getElementById('paper-content').style.display  = 'none';
+    document.getElementById('cluster-panel').style.display  = 'block';
+
+    const members   = nodes.filter(n => selectedIds.has(n.id));
+    const memberIds = new Set(members.map(n => n.id));
+
+    /* header — no color or description, just a count */
+    const nameEl = document.getElementById('cluster-panel-name');
+    nameEl.textContent = `Custom selection (${members.length})`;
+    nameEl.style.color = '#334155';
+    document.getElementById('cluster-panel-dot').style.background = '#94a3b8';
+    document.getElementById('cluster-panel-desc').textContent = 'Ctrl+click nodes to add or remove them.';
+
+    /* stats — identical logic to showClusterPanel */
+    let indegree = 0, outdegree = 0;
+    links.forEach(l => {
+        const sid = nodeId(l.source), tid = nodeId(l.target);
+        if (memberIds.has(tid)) indegree++;
+        if (memberIds.has(sid)) outdegree++;
+    });
+
+    const years    = members.map(n => n.year).filter(Boolean).sort((a, b) => a - b);
+    const earliest = years[0] ?? '—';
+    const latest   = years[years.length - 1] ?? '—';
+
+    const authorCount = new Map();
+    members.forEach(n => {
+        (Array.isArray(n.authors) ? n.authors : []).forEach(a =>
+            authorCount.set(a, (authorCount.get(a) ?? 0) + 1));
+    });
+    const repeatAuthors = [...authorCount.entries()]
+        .filter(([, c]) => c > 1)
+        .sort((a, b) => b[1] - a[1]);
+
+    document.getElementById('cluster-stat-indegree').textContent  = indegree;
+    document.getElementById('cluster-stat-outdegree').textContent = outdegree;
+    document.getElementById('cluster-stat-papers').textContent    = members.length;
+    document.getElementById('cluster-stat-years').textContent     =
+        earliest === latest ? earliest : `${earliest} – ${latest}`;
+
+    const authorsEl    = document.getElementById('cluster-stat-authors-row');
+    const authorsValEl = document.getElementById('cluster-stat-authors');
+    if (repeatAuthors.length > 0) {
+        authorsValEl.innerHTML = repeatAuthors
+            .map(([a, n]) => `<span class="author-tag"><a href="https://scholar.google.com/citations?view_op=search_authors&mauthors=${a.replaceAll(' ', '+')}" target="_blank">${a}</a> <span class="author-count">(${n})</span></span>`)
+            .join('');
+        authorsEl.style.display = 'block';
+    } else {
+        authorsEl.style.display = 'none';
+    }
+
+    const listEl = document.getElementById('cluster-paper-list');
+    listEl.innerHTML = '';
+    members.sort((a, b) => (a.year ?? 0) - (b.year ?? 0)).forEach(n => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="cp-year">${n.year ?? '?'}</span>
+                        <span class="cp-title">${n.label ?? n.key}</span>`;
+        listEl.appendChild(li);
     });
 }
 

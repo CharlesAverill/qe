@@ -1,0 +1,25 @@
+clusters:
+  - key: LLM
+    label: "LLMs"
+    description: "Papers using Large Language Models as the primary proof automation mechanism, including fine-tuned provers, RAG-based approaches, and RL-trained LLMs"
+    color: "#6366f1"
+  - key: ClassicalML
+    label: "Classical ML"
+    description: "Non-LLM machine learning approaches: k-NN, RNNs, shallow networks, etc"
+    color: "#10b981"
+  - key: Algorithmic
+    label: "Algorithmic"
+    description: "Symbolic AI, search heuristics, and rule-based systems with no learned components"
+    color: "#f59e0b"
+  - key: Environment
+    label: "Environment"
+    description: "Papers whose primary contribution is a dataset, benchmark, or instrumented ITP environment for training and evaluating ML systems"
+    color: "#EE7674"
+  - key: Survey
+    label: "Survey"
+    description: "Papers that summarize a body of work"
+    color: "#763DCB"
+  - key: ToRead
+    label: "Unread"
+    description: "Papers I haven't read yet. How did you find this message?"
+    color: "#94a3b8"

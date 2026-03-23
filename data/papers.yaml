@@ -99,11 +99,12 @@ nodes:
     authors:
       - Josef Urban
     conf: ESARLT
-    url: https://www.researchgate.net/publication/220806094_MaLARea_a_Metasystem_for_Automated_Reasoning_in_Large_Theories
+    url: http://ftp.informatik.rwth-aachen.de/Publications/CEUR-WS/Vol-257/05_Urban.pdf
     cluster: ClassicalML
     notes: |
       First to integrate modern data-driven ML into ATP, won LTB in CASC-2007
       Depends on the SNoW linear classification model
+      Uses ML to prune premises from the ATP before each round of proving
   - key: rippling
     label: "Rippling: a heuristic for guiding inductive proofs"
     year: 1993
@@ -146,14 +147,6 @@ nodes:
     conf: NeurIPS
     cluster: ToRead
     url: https://arxiv.org/abs/1805.07563
-  - key: ml_for_heuristic_opt
-    label: "Machine Learning for Heuristic Optimisation and Premise Selection in Automated Theorem Proving"
-    year: 2023
-    authors:
-      - Edvard K. Holden
-    conf: The University of Manchester
-    cluster: ToRead
-    url: https://www.proquest.com/docview/3059441938
   - key: formal_premise_selection
     label: "Formal Premise Selection With Language Models"
     year: 2022
@@ -298,8 +291,12 @@ nodes:
       - Gligoric Milos
       - Zachary Tatlock
     conf: FTPL
-    cluster: ToRead
+    cluster: Survey
     url: https://arxiv.org/abs/2003.06458
+    notes: |
+      Identifies challenges and discusses solutions in scaling formal verification for real-world software
+      Discusses Hammers as automation tools
+      Does not approach automation approaches other than Hammers, reflection, and alternate proof languages such as SSReflect
   - key: gptf
     label: "Generative Language Modeling for Automated Theorem Proving"
     year: 2020
@@ -644,175 +641,37 @@ nodes:
       Hammer for Coq that translates dependently-typed expressions to first-order logic expressions
       Evaluated on Coq standard library, claims 17-40% success rate
       k-NN classifier for premise selection
-
-edges:
-  - from: tactok
-    to:
-      - coqgym
-      - tactictoe
-      - gamepad
-      - deepmath
-      - hammering
-      - coqhammer
-  - from: coqgym
-    to:
-      - sepia
-      - tactictoe
-      - holist
-      - gamepad
-      - coqhammer
-  - from: leandojo
-    to:
-      - gptf
-      - minif2f
-      - pact
-      - holist
-      - coqgym
-      - formal_premise_selection
-      - tactictoe
-      - hypertree_ps
-      - gamepad
-      - no_imitation
-      - hammering
-      - coqhammer
-      - draft_sketch_prove
-      - autoformalization_llms
-  - from: llmsurvey
-    to:
-      - coqgym
-      - tactok
-      - leandojo
-      - minif2f
-      - gptf
-      - coqhammer
-  - from: pact
-    to:
-      - gptf
-      - tactictoe
-      - tactician
-      - holist
-      - coqgym
-      - proverbot
-      - no_imitation
-      - hammering
-  - from: minif2f
-    to:
-      - gptf
-      - pact
-      - holist
-      - no_imitation
-      - coqgym
-  - from: deepseek_prover
-    to:
-      - minif2f
-      - leandojo
-      - draft_sketch_prove
-      - hypertree_ps
-      - autoformalization_llms
-  - from: draft_sketch_prove
-    to:
-      - minif2f
-      - holist
-      - no_imitation
-  - from: gptf
-    to:
-      - holist
-      - gamepad
-      - coqgym
-      - no_imitation
-      - deepmath
-  - from: holist
-    to:
-      - tactictoe
-      - gamepad
-      - deepmath
-  - from: tactictoe
-    to:
-      - malarea
-      - sepia
-      - hammering
-  - from: gamepad
-    to:
-      - deepmath
-      - tactictoe
-  - from: sisyphus
-    to:
-      - tactician
-      - qed_at_large
-  - from: autoformalization_llms
-    to:
-      - no_imitation
-  - from: rango
-    to:
-      - no_imitation
-      - coqhammer
-      - draft_sketch_prove
-      - hypertree_ps
-      - autoformalization_llms
-  - from: no_imitation
-    to:
-      - holist
-      - gamepad
-      - coqgym
-      - proverbot
-      - tactictoe
-  - from: proverbot
-    to:
-      - deepmath
-      - holist
-      - tactictoe
-      - gamepad
-      - coqgym
-      - coqhammer
-  - from: deepmath
-    to:
-      - hammering
-  - from: tactician
-    to:
-      - tactictoe
-      - sepia
-      - coqgym
-      - gamepad
-      - proverbot
-      - coqhammer
-  - from: qed_at_large
-    to:
-      - coqhammer
-  - from: lean_copilot
-    to:
-      - coqhammer
-  - from: coqhammer
-    to:
-      - hammering
-  - from: alphaproof
-    to:
-      - draft_sketch_prove
-      - hypertree_ps
-      - deepseek_prover
-      - autoformalization_llms
-  - from: goedel
-    to:
-      - draft_sketch_prove
-      - hypertree_ps
-      - deepseek_prover
-      - autoformalization_llms
-
-clusters:
-  - key: LLM
-    description: "Papers using Large Language Models as the primary proof automation mechanism, including fine-tuned provers, RAG-based approaches, and RL-trained LLMs"
-    color: "#6366f1"
-  - key: ClassicalML
-    description: "Non-LLM machine learning approaches: k-NN, RNNs, shallow networks, etc"
-    color: "#10b981"
-  - key: Algorithmic
-    description: "Symbolic AI, search heuristics, and rule-based systems with no learned components"
-    color: "#f59e0b"
-  - key: Environment
-    description: "Papers whose primary contribution is a dataset, benchmark, or instrumented ITP environment for training and evaluating ML systems"
-    color: "#EE7674"
-  - key: Survey
-    description: "Papers that summarize a body of work"
-    color: "#763DCB"
-  - key: ToRead
-    description: "Papers I haven't read yet. How did you find this message?"
-    color: "#94a3b8"
+  - key: ilp_survey
+    label: "Inductive Logic Programming At 30: A New Introduction"
+    year: 2022
+    authors:
+      - Andrew Cropper
+      - Sebastijan Dumančić
+    conf: JAIR
+    cluster: Survey
+    url: https://www.jair.org/index.php/jair/article/view/13507
+    notes: |
+      Survey over learning *induction*, the process of creating general rules from specific examples, via logic programming
+      ILP is a form of machine learning that learns relationships rather than functions
+  - key: inductive_inv_gen
+    label: "Inductive invariant generation via abductive inference"
+    year: 2013
+    authors:
+      - Isil Dillig
+      - Thomas Dillig
+      - Boyang Li
+      - Ken McMillan
+    conf: "SIGPLAN Notices"
+    cluster: ToRead
+    url: https://dl.acm.org/doi/abs/10.1145/2544173.2509511
+  - key: invgen_technique
+    label: "A Technique for Invariant Generation"
+    year: 2001
+    authors:
+      - A. Tiwari
+      - H. Rueß
+      - H. Saïdi
+      - N. Shankar 
+    conf: TACAS
+    cluster: ToRead
+    url: https://link.springer.com/chapter/10.1007/3-540-45319-9_9
