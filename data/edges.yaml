@@ -68,6 +68,12 @@ edges:
       - minif2f
       - holist
       - no_imitation
+      - tactictoe
+      - pact
+      - hypertree_ps
+      - gptf
+      - autoformalization_llms
+      - coqgym
   - from: gptf
     to:
       - holist

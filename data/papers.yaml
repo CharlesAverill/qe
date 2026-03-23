@@ -324,8 +324,11 @@ nodes:
       - Yuhuai Wu
       - Guillaume Lample
     conf: arXiv
-    cluster: ToRead
+    cluster: LLM
     url: https://arxiv.org/abs/2210.12283
+    notes: |
+      Uses informal proof *drafts* (natural-language proofs) to generate *sketches* (sequences of high-level reasoning steps) that are solved by OTS ATPs
+      Achieves ~40% success rate on miniF2F, 20-30% higher than baselines (sledgehammer, thor)
   - key: alphaproof
     label: "Olympiad-level formal mathematical reasoning with reinforcement learning"
     year: 2025
