@@ -86,6 +86,7 @@ edges:
       - tactictoe
       - gamepad
       - deepmath
+      - malarea_full
   - from: tactictoe
     to:
       - malarea
@@ -167,3 +168,13 @@ edges:
   - from: nqthm
     to:
       - rippling
+  - from: rltp
+    to:
+      - malarea_full
+  - from: hammering
+    to:
+      - malarea
+      - malarea_full
+  - from: malarea_full
+    to:
+      - malarea
